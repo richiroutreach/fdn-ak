@@ -1,0 +1,119 @@
+{% load actionkit_tags %}
+<!DOCTYPE html>
+<html lang="{{page.lang.iso_code|default:"en"}}"{% if page.lang.is_rtl %} dir="rtl"{% endif %}>
+<!-- Foundation Template -->
+<!-- wrapper.html -->
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	
+	<title>{% block title %}{{ page.title }} | {% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}{% endblock %}</title>
+
+	<script>startTime=new Date()</script>
+
+	{% if form.id %}
+		<meta name="description" property="og:description" content="{% block description %}{{ page.custom_fields.description|default:form.intro|striptags }}{% endblock %}">
+	{% endif %}
+
+	{% if page.custom_fields.image %}
+		<meta property="og:image" content="{{ page.custom_fields.image }}">
+	{% endif %}
+
+	{% block meta_additions %}{% endblock %}
+
+	{% block css_additions %}{% endblock %}
+
+	{% load_ak_context context %}
+	
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+	{% load_js %}
+		/resources/actionkit.js
+	{% end %}
+
+	{% block script_additions %}{% endblock %}
+
+	<!-- Theme CSS -->
+	<link rel="stylesheet" href="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/css/actionkit.css" />
+	
+	<!-- Foundation JS -->   
+	<script src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/js/modernizr.js"></script>
+</head>
+
+<body class="{{ filename|split:'.'|nth:0 }}-page lang-{{page.lang.iso_code|default:"unknown"}}{% if page.lang.is_rtl %} ak-rtl{% endif %} ak-no-js">
+	<!-- Required AK JS -->
+	<script type="text/javascript">actionkit.forms.initPage()</script>
+
+	<div class="container">
+		<div class="header-wrapper row">
+			<div class="header large-12 columns">
+				<h1 class="hidden">Food Democracy Now!</h1>
+				<img src="https://s3.amazonaws.com/Food_Democracy_Now/images/header.png" alt="Logo" title="Food Democracy Now!" class="hide-for-small">
+				<img src="https://s3.amazonaws.com/Food_Democracy_Now/images/mobile-head.png" alt="Logo" title="Food Democracy Now!" class="show-for-small">	
+			</div> <!-- .header -->
+
+			<div class="large-12 columns navigation">
+				<nav class="top-bar">
+					<ul class="title-area">
+						<li class="name show-for-small">{% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}</li>
+						<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+					</ul> <!-- .title-area -->
+
+					<section class="top-bar-section">
+						<ul class="left">
+							<li><a href="#"></a></li>
+						</ul> <!-- .left -->
+					</section> <!-- .top-bar-section -->
+				</nav> <!-- .top-bar -->
+			</div> <!-- .navigation -->
+		</div> <!-- .header-wrapper -->
+
+		<div class="body-wrapper row">
+			<div id="body" class="large-12 columns body">
+				{% block content %}{% endblock %}
+			</div> <!-- .body -->
+		</div> <!-- .body-wrapper -->
+
+		{% block below_form %}
+			<script type="text/javascript">
+				actionkit.forms.contextRoot = '/context/';
+				actionkit.forms.initForm('act');
+			</script>
+		{% endblock %}
+
+		<div class="footer-wrapper row">
+			<div class="large-6 columns footer-left">
+				<a href="//example.com/privacy/">{{ 'Privacy'|ak_text:'privacy' }}</a> | <a href="//example.com/contact/">{{ 'Contact'|ak_text:'contact' }}</a>
+			</div> <!-- .footer-left -->
+
+			<div class="large-6 columns footer-right">
+				{% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}
+			</div> <!-- .footer-right -->
+		</div> <!-- .footer-wrapper --> 
+	</div> <!-- .container -->
+
+	{% if analytics_key %}
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', '{{ analytics_key }}']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+				var ga = document.createElement('script'); ga.type = 'text/javascript';
+				ga.async = true;
+				ga.src = ('https:' == document.location.protocol ? 'https://ssl' :
+				'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0];
+				s.parentNode.insertBefore(ga, s);
+			})();
+		</script>
+	{% endif %}
+
+	<script src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/js/foundation.min.js"></script>
+
+	<script>
+		// Initalize Foundation
+		$(document).foundation();
+	</script>	
+</body>
+</html>

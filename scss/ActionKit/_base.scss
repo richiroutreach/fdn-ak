@@ -1,0 +1,24 @@
+* {
+	transition: 300ms ease-out;
+}
+
+
+body {
+	background: url(https://s3.amazonaws.com/Food_Democracy_Now/images/background.gif);
+}
+
+[class*="column"] + [class*="column"]:last-child {
+	float: left;
+}
+
+.container {
+	background: #FFF;
+	box-shadow: 0 0 5px #878787;
+	max-width: 62.5rem;
+	margin: 0 auto 2rem;
+	border-radius: 0 0 10px 10px;
+}
+
+.hidden {
+	display: none;
+}

@@ -1,0 +1,63 @@
+#navigation {
+	padding: 0;
+
+	.top-bar {
+		border-bottom: 1px solid black;
+
+		@media #{$medium-up} {
+			background: url(https://s3.amazonaws.com/Food_Democracy_Now/images/dirt_menu_bg.png);
+		
+			li {
+				background: transparent;
+
+				a {
+					background: transparent;
+					text-transform: uppercase;
+					font-size: 1.15rem;
+
+					&:hover {
+						background: transparent;
+						color: $gold;
+					}
+				}
+			}
+		}
+	}
+
+	.socmed {
+		a {
+			color: white;
+			background: $green;
+			border-radius: 500px;
+			box-shadow: 0 0 3px #002100 inset;
+			display: inline-block;
+			margin-top: 6px;
+			width: 32px;
+			height: 32px;
+			color: white;
+
+			&.tw {
+				.fa {
+					margin-left: 5px;
+				}
+
+				&:hover {
+					background: $twitter-blue;
+				}
+			}
+
+			&.fb {
+				&:hover {
+					background: $facebook-blue;
+				}
+			}
+
+			.fa {
+				font-size: 25px;
+				display: block;
+				margin-top: 5px;
+				margin-left: 8px;
+			}
+		}
+	}
+}

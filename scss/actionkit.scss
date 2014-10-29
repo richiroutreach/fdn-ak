@@ -1,0 +1,21 @@
+/*
+	Base Custom Styles for Food Democracy Now! Actionkit
+	nicole@richiroutreach.com
+	V0.1
+	09/30/2014
+*/
+@import "settings";
+@import "foundation";
+
+$gold: #FFD302;
+$green: #78B620;
+$red: #C90000;
+
+$twitter-blue: #4099FF;
+$facebook-blue: #3b5998;
+
+@import "actionkit/base";
+@import "actionkit/header";
+@import "actionkit/nav";
+@import "actionkit/donate";
+@import "actionkit/footer";

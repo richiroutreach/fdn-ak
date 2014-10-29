@@ -1,0 +1,17 @@
+.footer-wrapper {
+	font-size: 0.7rem;
+	font-family: Georgia, serif;
+	padding: 0.5rem 0;
+	border-top: solid #ddd 1px;
+	color: $green;
+
+	a {
+		color: $green;
+		font-weight: bold;
+		text-decoration: none;
+	}
+
+	.footer-right {
+		text-align: right;
+	}
+}
