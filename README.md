@@ -1,4 +1,6 @@
-# Foundation Compass Template
+# Food Democracy Now ActionKit Template
+
+Need to change all this below -->
 
 The easiest way to get started with Foundation + Compass.
 
