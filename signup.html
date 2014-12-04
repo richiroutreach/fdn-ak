@@ -1,0 +1,35 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+
+{% block content %}
+
+<h2>{{ page.title }}</h2>
+
+<div id="signup-story" class="col end">
+
+{% autoescape off %}
+
+<div class="ak-abovefold">{% include_tmpl form.introduction_text %}</div>
+
+{% endautoescape %}
+
+{% include "./progress_meter.html" %}
+</div>
+
+<div id="signup-form" class="col border">
+
+<div class="ak-mobile-lead"></div>
+
+<form class="action_form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+
+{% include "./user_form_wrapper.html" %}
+
+<button type="submit">Sign Up</button>
+
+<input type="hidden" name="page" value="{{ page.name }}">
+
+</div>
+
+
+</form>
+
+{% endblock %}

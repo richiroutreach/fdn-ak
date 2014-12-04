@@ -1,0 +1,36 @@
+{% comment %}
+
+#progress classes in actionkit.css are:
+
+basic-progress (neutral solid grey bar, no images), and
+classic-progress (green gradient bar)
+rounded-progress (extreme makeover; more a demo than anything)
+
+Play around and add your own style!
+
+{% endcomment %}
+{% if page.goal %}
+
+<!-- Begin progress meter code.-->
+<div class="basic-progress ak-original-progress-meter" id="progress"></div>
+
+<script type="text/ak-template" for="progress">
+[% with (progress) { if ( goal && total ) { %]
+[% progress.current = goal_type == 'dollars' ? total.dollars : total.actions; %]
+<div class="progress-holder">
+<div class="progress-bar" style="width: [%= progress.current > goal ? 100 : parseInt(progress.current/goal*100) %]%;">&nbsp;</div>
+<div class="progress-percent">[%= parseInt((progress.current/goal)*100) %]%</div>
+</div>
+<div class="progress-caption">
+[% if (goal_type == "dollars") { %]
+  We've raised {{ page.currency_sym|default:"$" }}[%= add_commas(total.dollars) %]&mdash;[%= parseInt((total.dollars/goal)*100) %]% of our goal of {{ page.currency_sym|default:"$" }}[%= add_commas(goal) %]!
+[% } else { %]  
+  [%= add_commas(total.actions) %] [%= total.actions != 1 ? 'actions' : 'action' %] taken&mdash;[%= parseInt((total.actions/goal)*100) %]% of our goal of [%= add_commas(goal) %]!
+[% } %]
+</div>
+[% } } %]
+</script>
+
+<input type="hidden" name="want_progress" value="1" />
+<!-- End progress meter code -->
+{% endif %}

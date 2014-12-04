@@ -82,7 +82,7 @@ form .row.background {
 	margin-top: 3rem;
 
 	.button {
-		&.next, &.prev {
+		&.next, &.prev, &.submit {
 			background: $green;
 			display: inline-block;
 			margin: 0 0.5rem;
@@ -175,6 +175,89 @@ form .row.background {
 	}
 }
 
-.page-2, .page-3 {
-	display: none;
+.splash-layout {
+	.page-2, .page-3, .page-4 {
+		display: none;
+	}
+
+	.user-form, .payment-form {
+		label {
+			position: absolute;
+			padding: 0.5rem 1rem;
+			color: $label-color;
+			left: 0px;
+			z-index: 1;
+			font-size: 1rem;
+			pointer-events: none;
+
+			&.focus {
+				color: rgba($label-color, 0.5);
+			}
+
+			&.has-content {
+				display: none;
+
+				& + select {
+					color: black;
+				}
+			}
+
+			&.has-error {
+				color: $errorColor;
+
+				& + select {
+					color: $errorColor;
+				}
+			}
+		}
+
+		input {
+			font-size: 1rem;
+		}
+
+		select {
+			margin: 0;
+			height: 38px;
+			color: $label-color;
+			font-size: 1rem;
+			padding-top: 8px;
+		}
+
+		.divider {
+			font-size: 1.75rem;
+			text-align: center;
+		}
+	}
+
+	.form-error-box-wrapper {
+		margin-top: 10rem;
+		position: relative;
+		text-align: center;
+
+		#ak-errors {
+			margin: 0;
+			margin-top: -($column-gutter);
+			margin-left: -($column-gutter);
+
+			&:before {
+				content: "There was a problem with your submission:";
+				display: block;
+				color: white;
+			}
+
+			li {
+				margin-left: 1rem;
+			}
+		}
+
+		.form-error-box {
+			text-align: left;
+			display: none;
+			position: absolute;
+			padding: $column-gutter / 2;
+			background: rgba(#000, 0.75);
+			color: $red;
+			width: rem-calc(250) + ($column-gutter);
+		}
+	}
 }

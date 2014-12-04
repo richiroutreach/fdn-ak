@@ -1,0 +1,47 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+
+{% block content %}
+
+<form class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+<input type="hidden" name="page" value="{{ page.name }}">
+
+<h2>{{ page.title }}</h2>
+
+<div class="col end" id="petition-box">
+    {% autoescape off %}
+
+    <div class="ak-abovefold box">{% if form.statement_leadin %}{% include_tmpl form.statement_leadin %} {% endif %}<b>&ldquo;</b>{% include_tmpl form.statement_text %}<b>&rdquo;</b></div>
+    
+    {% endautoescape %}
+
+    <a class="ak-continued" href="#more">Read more...</a>
+</div>
+
+<div id="petition-form" class="border ak-labels-overlaid col">
+
+    {% include "./user_form_wrapper.html" %}
+
+    <div class="ak-field"><label class="wide" for="id_comment">Comment</label> <textarea id="id_comment" name="action_comment"></textarea></div>
+
+    {% include "./inline_tellafriend.html" %}
+
+    <button type="submit" class="ak-styled-submit-button">Sign Petition</button>
+
+</div>
+
+
+<div id="petition-story" class="col end">
+    <a name="more"></a>
+    {% autoescape off %}
+
+    <div>{% include_tmpl form.about_text %}</div>
+
+    {% endautoescape %}
+
+    {% include "./progress_meter.html" %}
+</div>
+
+
+</form>
+
+{% endblock %}

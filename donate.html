@@ -1,0 +1,1304 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}{% load smartif %}
+<!-- @START Foundation Template/donate.html -->
+
+{% block content %}
+
+<script language="javascript">
+//<!--
+	function clear_radio_buttons() {
+		$('input.amount_radio_button').attr('checked', false);
+	}
+
+	function clear_other() {
+		$('#amount_other_field').val("");
+	}
+
+	var address_fields = [ 'address1', 'address2', 'city', 
+		'state', 'zip' {% if page.allow_international %},'postal', 'region', 'country'{% endif %} ];
+
+	function toggle_shipping(e) {
+		for (i in address_fields) {
+			field = address_fields[i];
+			
+			if (e.checked) {
+				$('#shipping_' + field).val($('#' + field).val()||'').change();
+				$('#id_shipping_state').val($('#state,#id_state').val()||'').change();
+				$('#shipping_' + field).attr("readonly", true); 
+			} else {
+				$('#shipping_' + field).val("").change();
+				$('#id_shipping_state').val("").change();
+				$('#shipping_' + field).attr("readonly", false);
+			}
+		}
+
+		{% if page.allow_international %}
+			shipping_country_change();
+		{% endif %}
+	}
+
+	function sync_to_shipping(e) {
+		if (!$('#shipping_same').attr("checked"))
+			return;
+		
+		for (i in address_fields) {
+			field = address_fields[i];
+			$('#shipping_' + field).val($('#' + field).val());
+			$('#id_shipping_state').val($('#state,#id_state').val());
+		}
+
+		{% if page.allow_international %}
+			shipping_country_change();
+		{% endif %}
+	}
+
+	function update_total() {
+		var total = 0.0;
+
+		$('.ak_product_inputs').each(function (i) {
+			// max == 1 produces checkboxes for these
+			if (this.type == "checkbox" && !this.checked)
+				return;
+
+			// check that quantity is a valid int
+			var quantity = this.value;
+			
+			if (quantity.length == 0 || !/^[1-9]\d*$/.test(quantity))
+				return;
+
+			// and price is a valid dollar amount
+			var price = $('#' + this.id + '_price').text();
+
+			if (price.length == 0 || !/^[1-9]\d*(\.\d\d)?$/.test(price))
+				return;
+
+			total += parseInt(quantity) * parseFloat(price);
+		});
+
+		$('.ak_candidate_inputs').each(function (i) {
+			// check that amount is a valid amount
+			var amount = this.value;
+
+			if (amount.length == 0 || !/^[0-9]\d*(\.\d\d)?$/.test(amount))
+				return;
+
+			total += parseFloat(amount);
+		});
+
+		// look for checked off donation amounts
+		var amount_checked = $('input:radio[name=amount]:checked').val(); 
+
+		if (amount_checked) {
+			total += parseFloat(amount_checked);
+		} else {
+			// or other amounts
+			var other = $('#amount_other_field').val();
+
+			if (other && /^[0-9]\d*(\.\d{2})?$/.test(other))
+				total += parseFloat(other);
+		}
+
+		var new_total = total == 0 ? "" : "$" + total.toFixed(2);
+
+		if (new_total != $('#total').html()) {
+			$('#total').html(new_total);
+		}
+	}
+
+	{% if page.allow_international %}
+		function country_change() {
+			country = $('#country').val();
+
+			if (country == 'United States') {
+				$('#us_billing_fields').show();
+				$('#intl_billing_fields').hide();
+			} else {
+				$('#us_billing_fields').hide();
+				$('#intl_billing_fields').show();
+			}
+
+			sync_to_shipping();
+		}
+
+		function shipping_country_change() {
+			shipping_country = $('#shipping_country').val();
+
+			if (shipping_country == 'United States') {
+				$('#us_shipping_fields').show();
+				$('#intl_shipping_fields').hide();
+			} else {
+				$('#us_shipping_fields').hide();
+				$('#intl_shipping_fields').show();
+			}
+		}
+	{% endif %}
+//-->
+</script>
+
+{% with page.payment_processor_information as pp %}
+	{% if pp.use_cse %}
+		<script language="javascript" src="/samples/ak_braintree_cse.js"></script>
+		<script language="javascript" src="https://js.braintreegateway.com/v1/braintree.js"></script>
+		<script type="text/javascript">
+			$(function () {
+				var form = $('form#act')[0];
+
+				clientSideEncryptionKey = "{{ pp.cse_key }}";
+				braintree_cse.encryptOnSubmit(form, clientSideEncryptionKey);
+
+				$('form#act :input[type=submit]').removeAttr('disabled');
+			});
+
+			window.onBraintreeDataLoad = function() {
+				BraintreeData.setup("{{ pp.merchant_id }}", "act", BraintreeData.environments.{{ pp.braintree_environment }});
+			};
+		</script>
+	{% endif %}
+
+	{% if pp.use_tr %}
+		<script language="javascript" src="/samples/braintree.js"></script>
+	{% endif %}
+{% endwith %}
+
+{% comment %}
+	/*
+		---------------------------------------------------------------------
+			Start Staged Donation Form
+		---------------------------------------------------------------------
+	*/
+{% endcomment %}
+
+<script language="javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
+<script language="javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/additional-methods.min.js"></script>
+
+<script>
+	/*
+		Get a value for a given URL parameter
+	*/
+	function getURLParameter(name) {
+	     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+	}
+
+	$(document).ready(function() {
+		/*
+			---------------------------------------------------------------
+				Fancy Radio Button Code
+			---------------------------------------------------------------
+		*/
+		$('.amounts input[name="amount"], .amounts input#amount_other_field').click(function() {
+			// Remove any labels that were marked at checked
+			$('.amounts label.checked').removeClass('checked'); 
+
+			// Add the label radio-checked
+			$(this).parent('label').addClass('checked');
+		});
+
+		$('.type input[name="donation_type"]').click(function() {
+			$('.type label.checked').removeClass('checked');
+
+			$(this).parent('label').addClass('checked');
+		});
+
+		/*
+			---------------------------------------------------------------
+				Forward / Back Buttons
+			---------------------------------------------------------------
+		*/
+		$('.next').click(function() {
+			if($('#act').valid()) {
+				var page = $(this).data('page');
+				var button = $(this);
+				
+				$(button).prop('disabled', true);
+
+				$('.page-' + (page - 1)).fadeOut(300, function() {
+					$('.page-' + page).delay(50).fadeIn(300, function() {
+						$(button).prop('disabled', false);
+					});
+				});
+			}
+		});
+
+		$('.prev').click(function() {
+			var page = $(this).data('page');
+			var button = $(this);
+				
+			$(button).prop('disabled', true);
+
+			$('.page-' + (page + 1)).fadeOut(300, function() {
+				$('.page-' + page).delay(50).fadeIn(300, function() {
+					$(button).prop('disabled', false);
+				});
+			});
+		});
+
+		/*
+			---------------------------------------------------------------
+				Make all panes the same height
+			---------------------------------------------------------------
+		*/
+		var minHeight = 0;
+
+		$('.donation-page').each(function() {
+			if($(this).height() > minHeight) {
+				minHeight = $(this).height();
+			}
+		});
+
+		$('.form-column').innerHeight(minHeight + 160);
+
+		/*
+			---------------------------------------------------------------
+				Javascript to overlay the form labels
+			---------------------------------------------------------------
+		*/
+		function checkContent(field) {
+			var label = $("label[for='"+$(this).attr('id')+"']");
+
+			var is_select = $(this).prop("selectedIndex");
+
+			if( $(this).val() || is_select) {
+				label.addClass("has-content");
+			} else {
+				label.removeClass("has-content");
+			}
+		}
+
+		$('.splash-layout input[type="text"], .splash-layout select').focus(function() {
+			var label = $("label[for='"+$(this).attr('id')+"']");
+
+			label.addClass("focus");
+		}).blur(function() {
+			var label = $("label[for='"+$(this).attr('id')+"']");
+
+			label.removeClass("focus");
+		}).bind('keydown', function() {
+			var label = $("label[for='"+$(this).attr('id')+"']");
+
+			label.addClass("has-content");
+		}).bind('dragenter', function() {
+			label.addClass("has-content");
+		}).bind('dragleave', function() {
+				setTimeout(function() {
+					checkContent(this);
+				},1);
+		}).bind('change', checkContent).bind('keyup', checkContent);
+
+		/*
+			---------------------------------------------------------------
+				Populate form off URL Parameters
+			---------------------------------------------------------------
+		*/
+
+		setTimeout(function() {
+			if( getURLParameter('amount') ) {
+				$('#id_amount_' + getURLParameter('amount')).parent('label').addClass('checked');
+			}
+
+			if( getURLParameter('donation_type') == "recurring") {
+				$('#id_type_monthly').prop('checked', true);
+
+				$('.type label.checked').removeClass('checked');
+
+				$('#id_type_monthly').parent('label').addClass('checked');
+			}
+
+			if( getURLParameter('state') ) {
+				$('#id_state').val( getURLParameter('state') );
+
+				$('label[for="id_state"]').addClass("has-content");
+			}
+
+			if( getURLParameter('zip') ) {
+				$('#zip').val( getURLParameter('zip') );
+
+				$('label[for="zip"]').addClass("has-content");
+			}
+		}, 250);
+
+		/*
+			---------------------------------------------------------------
+				Form Submission
+			---------------------------------------------------------------
+		*/
+
+		$('#act').submit(function() {
+			if( $(this).valid() ) {
+				$('.submit').prop('disabled', true).val("Processing...");
+			}
+		});
+
+		/*
+			---------------------------------------------------------------
+				Validation
+			---------------------------------------------------------------
+		*/
+		$('#act').validate({
+			rules: {
+				amount: {
+					require_from_group: [1, '.amount-list']
+				},
+
+				amount_other: {
+					require_from_group: [1, '.amount-list']
+				},
+
+				name: {
+					required: true
+				},
+
+				email: {
+					required: true,
+					email: true
+				},
+
+				address1: {
+					required: true
+				},
+
+				city: {
+					required: true
+				},                 
+
+				zip: {
+					required: true,
+					zipcodeUS: true
+				},
+
+				state: {
+					required: true
+				},
+
+				card_num: {
+					required: true,
+					creditcard: true
+				},
+
+				card_code: {
+					required: true
+				},
+
+				exp_date_month: {
+					required: true
+				},
+
+				exp_date_year: {
+					required: true
+				}
+			},
+
+			groups: {
+				amountList: 'amount amount_other'
+			},
+
+			messages: {
+				amount: {
+					require_from_group: 'Select an amount.'
+				},
+
+				amount_other: {
+					require_from_group: 'Select an amount.'
+				},
+
+				name: {
+					required: 'Enter your name.'
+				},
+
+				email: {
+					required: 'Enter a valid email address.',
+					email: 'Enter a valid email address.'
+				},
+
+				address1: {
+					required: 'Enter your address.'
+				},
+
+				city: {
+					required: 'Enter your city.'
+				},                 
+
+				state: {
+					required: 'Select your state.'
+				},
+
+				zip: {
+					required: 'Enter a valid ZIP code.',
+					zipcodeUS: 'Enter a valid zip code.'
+				},
+
+				card_num: {
+					required: "Enter your credit card number.",
+					creditcard: "Enter a valid credit card number."
+				},
+
+				card_code: {
+					required: "Enter your CVV code."
+				},
+
+				exp_date_month: {
+					required: "Select your card's month of expiration."
+				},
+
+				exp_date_year: {
+					required: "Select your card's year of expiration."
+				}   
+			},
+
+			errorElement: 'li',
+			errorClass: 'form-error',
+			errorLabelContainer: "#ak-errors",
+
+			highlight: function(element, errorClass, validClass) {
+				var label = $("label[for='"+$(element).attr('id')+"']");
+
+				$(label).addClass("has-error");
+			},
+
+			unhighlight: function(element, errorClass, validClass) {
+				var label = $("label[for='"+$(element).attr('id')+"']");
+
+				$(label).removeClass("has-error");
+			}
+		});			
+	});
+</script>
+
+<form id="act" name="act" class="staged {% if page.payment_processor_information.use_tr %}braintree_form{% endif %}" method="POST" action="/act/" accept-charset="utf-8">
+	<input type="hidden" name="orig_akid" value="{{ akid }}">
+	<input type="hidden" name="page" value="{{ page.name }}">
+	
+	{% if not page.allow_international %}
+		<input type="hidden" name="country" value="United States">
+	{% endif %}
+
+	<div class="row background tree splash-layout">
+		<div class="form-column large-6 large-offset-1 columns">
+			<div id="step-1" class="donation-page page-1">
+				{% comment %}
+					/*
+						---------------------------------------------------------------------
+							Page #1 - Display the ask
+						---------------------------------------------------------------------
+					*/ 
+				{% endcomment %}
+
+				<div class="page-title">
+					<h2>{{ page.title }}</h2>
+				</div> <!-- .page-title -->
+
+				<div class="ask-text">
+					{% include_tmpl form.ask_text %}
+				</div> <!-- .ask-text -->
+
+				<div class="page-buttons">
+					<input type="button" class="large button next" value="Donate Now" data-page="2"/>
+				</div> <!-- .page-buttons -->
+
+				<div class="alternate-methods">
+					<input type="button" class="button small paypal" value="Donate via PayPal" />
+					<input type="button" class="button small bitcoin" value="Donate via Bitcoin" />			
+				</div> <!-- .alternate-methods -->
+
+				{% comment %}
+					/*
+						---------------------------------------------------------------------
+							Page #1 - End 
+						---------------------------------------------------------------------
+					*/
+				{% endcomment %}
+			</div> <!-- .page1 -->
+
+			<div id="step-2" class="donation-page page-2">
+				{% comment %}
+					/*
+						---------------------------------------------------------------------
+							Page #2 - Donation Amounts
+						---------------------------------------------------------------------
+					*/ 
+				{% endcomment %}
+
+				<div class="row amounts">
+					<div class="large-12 columns">
+						<strong><h3>Donation Amount</h3></strong>
+					</div>
+
+					{% for amount in amounts %}
+						{% ifequal amount "other" %}
+							<div class="large-4 columns amount-other">
+								<noscript><input type="radio" value="" class="amount_radio_button" name="amount"></noscript>
+								<label for="amount_other_field" class="ak-btn radio">
+									{{ page.currency_sym }}<input type="text" id="amount_other_field" class="amount-list" name="amount_other" size="3" onKeypress="clear_radio_buttons();" onClick="update_total()" onBlur="update_total()" onChange="update_total()">
+								</label>
+							</div>
+						{% else %}
+							<div class="large-4 columns">
+								<label for="id_amount_{{amount}}" class="ak-btn radio">
+									<input type="radio" id="id_amount_{{amount}}" value="{{ amount }}" class="amount_radio_button amount-list" name="amount" onClick="clear_other(); update_total()"  onBlur="update_total()" onChange="update_total()" {% if not args.amount_other and amount == default_amount %}checked{% endif %}>{{ page.currency_sym }}{{ amount|commify }}
+								</label>
+							</div>
+						{% endifequal %}
+					{% endfor %}
+				</div>
+				
+				<div class="row type">
+					{% if page.custom_fields.recurring %}
+						<div class="large-12 columns">
+							<div id="type">
+								<p>*This donation will be a monthly recurring donation</p>
+								<input type="hidden" name="donation_type" value="recurring">
+							</div>
+						</div>
+					{% else %}
+						<div id="type">
+							<div class="large-12 columns">
+								<h3>Donation Type</h3>
+							</div>		
+
+							{% if page.custom_fields.recurring_default %}
+								<div class="large-4 columns">
+									<label class="radio" for="id_type_single"><input type="radio" id="id_type_single" name="donation_type" value="single"> One-Time</label>
+									<label class="radio checked" for="id_type_monthly"><input type="radio" id="id_type_monthly" name="donation_type" value="recurring" checked> Monthly</label>
+								</div>
+							{% else %}
+								<div class="large-4 columns">
+									<label class="radio checked" for="id_type_single"><input type="radio" id="id_type_single" name="donation_type" value="single" checked> One-Time</label>
+									<label class="radio" for="id_type_monthly"><input type="radio" id="id_type_monthly" name="donation_type" value="recurring"> Monthly</label>
+								</div>
+							{% endif %}
+						</div> <!-- #type -->
+					{% endif %}
+				</div> <!-- .row -->
+
+				<div class="page-buttons">
+					<input type="button" class="small button prev secondary" value="&lt; Back" data-page="1"/>
+					<input type="button" class="small button next" value="Next &gt;" data-page="3"/>
+				</div> <!-- .page-buttons -->
+
+				{% comment %}
+					/*
+						---------------------------------------------------------------------
+							Page #2 - End
+						---------------------------------------------------------------------
+					*/ 
+				{% endcomment %}
+			</div> <!-- .page-2 -->
+
+			<div id="step-3" class="donation-page page-3">
+				{% comment %}
+					/*
+						---------------------------------------------------------------------
+							Page #3 - User Form
+						---------------------------------------------------------------------
+					*/ 
+				{% endcomment %}
+				<div class="row">
+					<div class="large-12 columns">
+						<strong><h3>Billing Information</h3></strong>
+					</div>
+
+					<div class="user-form">
+						<div class="large-6 columns">
+							<label for="name">Name</label>
+							<input id="name" type="text" name="name" />
+						</div>
+
+						<div class="large-6 columns">
+							<label class="required" for="email">Email</label>
+							<input id="email" type="text" name="email" />
+						</div>
+
+						{% if has_shippable_products %}
+							<div class="large-12 columns">
+								<label for="address1">Billing Address</label>
+								<input id="address1" type="text" name="address1" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+							</div>
+
+							<div class="large-12 columns">
+								<label for="address2">Billing Address (optional)</label>
+								<input id="address2" type="text" name="address2" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+							</div>
+						{% else %}
+							<div class="large-12 columns">
+								<label for="address1">Billing Address</label>
+								<input id="address1" type="text" name="address1" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+							</div>
+						{% endif %}
+
+						<div class="large-4 columns">
+							<label for="city">City</label>
+							<input id="city" type="text" name="city" onchange="sync_to_shipping()" onblur="sync_to_shipping()" />
+						</div>
+
+						{% if page.allow_international %}
+							<div id="us_billing_fields">
+						{% endif %}
+
+						<div class="large-4 columns">
+							<label class="hidden" for="id_state">State</label>
+							{% with 'sync_to_shipping()' as onchange %}{% include "./state_select.html" %}{% endwith %}
+						</div>
+
+						<div class="large-4 columns">
+							<label for="zip">Zip</label>
+							<input id="zip" type="text" name="zip" maxlength="5" size="5" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+						</div>
+
+						{% if page.allow_international %}
+							</div>
+
+							<div id="intl_billing_fields">
+								<div class="large-4 columns">
+									<label for="region">Region</label>
+									<input id="region"  type="text" name="region" size="20" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+								</div>
+								
+								<div class="large-4 columns">
+									<label for="postal">Postal Code</label>
+									<input id="postal"  type="text" name="postal" size="10" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+								</div>
+							</div>
+
+							<div class="large-12 columns">
+								<label for="country" class="hidden">Country</label>
+								{% with 'country_change()' as onchange %}{% include "./country_select.html" %}{% endwith %}
+							</div>
+
+							<script language="javascript">country_change();</script>
+						{% endif %}
+					</div> <!-- labels overlaid (billing address) -->					
+				</div> <!-- .row -->
+
+				<div class="page-buttons">
+					<input type="button" class="small button prev secondary" value="&lt; Back" data-page="2"/>
+					<input type="button" class="small button next" value="Next &gt;" data-page="4"/>
+				</div> <!-- .page-buttons -->				
+				{% comment %}
+					/*
+						---------------------------------------------------------------------
+							Page #3 - End
+						---------------------------------------------------------------------
+					*/ 
+				{% endcomment %}
+			</div> <!-- .page-3 -->
+
+			<div id="step-4" class="donation-page payment-form page-4">
+				{% comment %}
+					/*
+						---------------------------------------------------------------------
+							Page #4 - Payment Form
+						---------------------------------------------------------------------
+					*/ 
+				{% endcomment %}
+				<div class="row">
+					<div class="large-12 columns">
+						<strong><h3>Payment Information</h3></strong>
+					</div>
+
+					{% if show_paypal %}
+						<div>
+							<input type="radio" name="paypal" value="0" id="pay_by_cc"> 
+							<label for="pay_by_cc" style="display: inline">Pay with Credit Card</label>
+						</div>
+
+						<input type="radio" name="paypal" value="1" id="pay_by_paypal" checked><label for="pay_by_paypal" style="display: inline;">
+						<img style="max-width: 150px" src="https://www.paypalobjects.com/webstatic/mktg/merchant/images/express-checkout-hero.png"></label>
+
+						<script>
+							function paypalradios() {
+								$(".ak-cc-box").addClass('ak-hide');
+
+								$("input[type='radio']").click(function() {
+									if ($("#pay_by_cc").is(':checked')) {
+										$(".ak-cc-box").slideDown();
+									}
+
+									if ($("#pay_by_paypal").is(':checked')) {
+										$(".ak-cc-box").slideUp();
+									}
+								});
+							}
+
+							$(document).ready(function() {
+								paypalradios();
+							});
+						</script>
+					{% endif %}
+
+					<div id="card_num_box" class="large-9 columns">
+						<label for="card_num">Credit Card #</label>
+						<input id="card_num" type="text" name="card_num">
+					</div>
+
+					<div id="card_code_box" class="large-3 columns">
+						<label for="card_code">CVV</label>
+						<input id="card_code" type="text" name="card_code" size="4" />
+					</div>
+
+					<div id="exp_date_box" class="large-12 columns cc-exp">
+						<div class="row">
+							<div class="large-2 small-5 columns">
+								<label for="exp_date_month">MM</label>
+								<select id="exp_date_month" type="text" name="exp_date_month">
+									<option value=""></option>
+									<option value="01">01</option>
+									<option value="02">02</option>
+									<option value="03">03</option>
+									<option value="04">04</option>
+									<option value="05">05</option>
+									<option value="06">06</option>
+									<option value="07">07</option>
+									<option value="08">08</option>
+									<option value="09">09</option>
+									<option value="10">10</option>
+									<option value="11">11</option>
+									<option value="12">12</option>
+								</select>
+							</div>
+
+							<div class="large-1 small-1 columns divider">
+								/
+							</div>
+
+							<div class="large-2 small-6 columns">
+								<label for="exp_date_year">YYYY</label>
+								<select id="exp_date_year" type="text" name="exp_date_year">
+									<option value=""></option>
+									<option value="14">2014</option>
+									<option value="15">2015</option>
+									<option value="16">2016</option>
+									<option value="17">2017</option>
+									<option value="18">2018</option>
+									<option value="19">2019</option>
+									<option value="20">2020</option>
+									<option value="21">2021</option>
+									<option value="22">2022</option>
+									<option value="23">2023</option>
+									<option value="24">2024</option>
+									<option value="25">2025</option>
+								</select>
+							</div>
+						</div> <!-- .row -->
+					</div><!-- .cc-exp-->
+				</div> <!-- .row -->
+
+				<div class="progress-wrapper">
+					{% include "./progress_meter.html" %}
+				</div>
+
+				<div class="page-buttons">
+					{% if page.payment_processor_information.use_cse %}
+						<input disabled="true" type="submit" class="button large submit" value="Submit Donation">
+						
+						<noscript>
+							<p><b>JavaScript is required</b> so this page can securely submit your donation.</p>
+						</noscript>
+					{% else %}
+						<input type="submit" class="button large submit" value="Submit Donation">
+					{% endif %}
+				</div> <!-- .page-buttons -->
+
+				<div class="alternate-methods">
+					<input type="button" class="small button prev" value="&lt; Back" data-page="3"/>		
+				</div> <!-- .alternate-methods -->
+				{% comment %}
+					/*
+						---------------------------------------------------------------------
+							Page #4 - End
+						---------------------------------------------------------------------
+					*/ 
+				{% endcomment %}
+			</div> <!-- .page-4 -->
+		</div> <!-- .form-column -->
+
+		<div class="large-3 large-offset-1 columns form-error-box-wrapper">
+			<ul id="ak-errors" class="form-error-box">		
+			</ul> <!-- .form-error-box -->
+
+			{% if page.custom_fields.image_url %}
+				<img src="{{ page.custom_fields.image_url }}">
+			{% endif %}
+		</div> <!-- .form-error-box-wrapper -->
+
+			{% comment %}
+			<div class="image-column large-3 large-offset-1 columns">
+				<img src="{{ page.custom_fields.image_url }}">
+			</div> <!-- .image-column -->
+			{% endcomment %}
+	</div> <!-- .row -->
+</form>
+
+<div class="row">
+	<div class="large-12 columns donate-footer">
+		<p><strong>Please note that donations are not tax-deductible.</p></strong>
+		<p>If you prefer to donate with a check or money order, please send to:<br>Food Democracy Now! | P.O.Box 5 | Clear Lake, Iowa | 50428</p>
+	</div> <!-- .donate-footer -->
+</div>
+{% comment %}
+	/*
+		---------------------------------------------------------------------
+			End Staged Donation Form
+		---------------------------------------------------------------------
+	*/
+{% endcomment %}
+
+{% comment %}
+<div class="area ak-mobile-padding">
+	<h2>{{ page.title }}</h2>
+
+	{% include_tmpl form.ask_text %}
+</div>
+
+<form id="act" name="act" class="{% if page.payment_processor_information.use_tr %}braintree_form{% endif %}" method="POST" action="/act/" accept-charset="utf-8">
+	<input type="hidden" name="orig_akid" value="{{ akid }}">
+	
+	{% if not page.allow_international %}
+		<input type="hidden" name="country" value="United States">
+	{% endif %}
+
+	<div id="donation-contact" class="border col ak-styled-fields">
+		<ul id="ak-errors"></ul>
+
+		<div style="display: none">
+			<div id="known_user">
+				Not <span id="known_user_name"></span>?  <a href="?" onclick="return actionkit.forms.logOut()">Click here.</a>
+			</div>
+		</div>
+
+		<div id="unknown_user"></div>
+
+		{% if has_shippable_products %}
+			<label class="ak-label-above">Billing Address</label>
+		{% endif %}
+
+		<div class="ak-labels-overlaid ak-errs-below">
+			<div>
+				<label for="name">Name</label>
+				<input id="name" type="text" name="name" />
+			</div>
+
+			<div>
+				<label class="required" for="email">Email</label>
+				<input id="email" type="text" name="email" />
+			</div>
+
+			{% if has_shippable_products %}
+				<div>
+					<label for="address1">Billing address line 1</label>
+					<input id="address1" type="text" name="address1" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+				</div>
+
+				<div>
+					<label for="address2">Billing address line 2 (optional)</label>
+					<input id="address2" type="text" name="address2" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+				</div>
+			{% else %}
+				<div>
+					<label for="address1">Billing address</label>
+					<input id="address1" type="text" name="address1" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+				</div>
+			{% endif %}
+
+			<div>
+				<label for="city">City</label>
+				<input id="city" type="text" name="city" onchange="sync_to_shipping()" onblur="sync_to_shipping()" />
+			</div>
+
+			{% if page.allow_international %}
+				<div class="ak-errs-below" id="us_billing_fields">
+			{% endif %}
+
+			<div>
+				<label for="id_state">State</label>
+				{% with 'sync_to_shipping()' as onchange %}{% include "./state_select.html" %}{% endwith %}
+			</div>
+
+			<div>
+				<label for="zip">Zip</label>
+				<input id="zip" type="text" name="zip" maxlength="5" size="5" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+			</div>
+
+			{% if page.allow_international %}
+				</div>
+
+				<div class="ak-errs-below" id="intl_billing_fields">
+					<div>
+						<label for="region">Region</label>
+						<input id="region"  type="text" name="region" size="20" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+					</div>
+					
+					<div>
+						<label for="postal">Postal Code</label>
+						<input id="postal"  type="text" name="postal" size="10" onchange="sync_to_shipping()" onblur="sync_to_shipping()"/>
+					</div>
+				</div>
+
+				<div>
+					<label for="country">Country</label>
+					{% with 'country_change()' as onchange %}{% include "./country_select.html" %}{% endwith %}
+				</div>
+
+				<script language="javascript">country_change();</script>
+			{% endif %}
+		</div> <!-- labels overlaid (billing address) -->
+
+		{% if page.has_candidates %}
+			{% if has_shippable_products %}
+			{% endif %}
+
+			<div class="ak-label-above" id="occ-emp-why">
+				For political donations, we're required to ask for your <strong>employer</strong> and <strong>occupation</strong>:
+			</div>
+
+			<div class="ak-labels-overlaid ak-errs-below">
+				<div>
+					<label for="action_employer">Employer</label>
+					<input id="action_employer"  type="text" name="action_employer" size="20"/>
+					<input type="hidden" name="required" value="action_employer"/>
+				</div>
+
+				<div>
+					<label for="action_occupation">Occupation</label>
+					<input id="action_occupation"  type="text" name="action_occupation" size="20"/>
+					<input type="hidden" name="required" value="action_occupation"/>
+				</div>
+			</div>
+		{% endif %}
+
+		<input type="hidden" name="page" value="{{ page.name }}">
+		
+		<div id="shipping_address">
+			{% if has_shippable_products %}
+				<label class="ak-label-above">Shipping Address</label>
+				
+				{% with "shipping_" as input_name_prefix %}
+					<div>
+						<input id="shipping_same" type="checkbox" name="shipping_same" value="1" onchange="toggle_shipping(this)"/>
+						<label for="shipping_same">Ship to billing address</label>
+					</div>
+
+					<div class="ak-labels-overlaid ak-errs-below">    
+						<div>
+							<label for="shipping_address1">Shipping address line 1</label>
+							<input id="shipping_address1" type="text" name="shipping_address1" />
+						</div>
+
+						<div>
+							<label for="shipping_address2">Shipping address line 2 (optional)</label>
+							<input id="shipping_address2" type="text" name="shipping_address2" />
+						</div>
+
+						<div>
+							<label for="shipping_city">Shipping city</label>
+							<input id="shipping_city" type="text" name="shipping_city" />
+						</div>
+
+						{% if page.allow_international %}
+							<div id="us_shipping_fields">
+								<div>
+									<label for="id_shipping_state" class="hidden">Shipping state</label>
+									{% include "./state_select.html" %}
+								</div>
+
+								<div>
+									<label for="shipping_zip">Shipping ZIP</label>
+									<input id="shipping_zip"  type="text" name="shipping_zip" maxlength="5" size="5"/>
+								</div>
+							</div>
+
+							<div id="intl_shipping_fields">
+								<div>
+									<label for="shipping_region">Shipping region</label>
+									<input id="shipping_region"  type="text" name="shipping_region" size="20"/>
+								</div>
+
+								<div>
+									<label for="shipping_postal">Shipping postal Code</label>
+									<input id="shipping_postal"  type="text" name="shipping_postal" size="10"/>
+								</div>
+							</div>
+
+							<div>
+								<label for="shipping_country" class="hidden">Shipping country</label>
+								{% with 'shipping_country_change()' as onchange %}{% include "./country_select.html" %}{% endwith %}
+							</div>
+
+							<script language="javascript">shipping_country_change();</script>
+						{% else %}
+							<div>
+								<label for="id_shipping_state">Shipping state</label>
+								{% include "./state_select.html" %}
+							</div>
+
+							<div>
+								<label for="shipping_zip">Shipping ZIP</label>
+								<input id="shipping_zip"  type="text" name="shipping_zip" maxlength="5" size="5"/>
+							</div>
+						{% endif %}
+					</div> <!-- labels overlaid -->
+				{% endwith %}
+			{% endif %}
+		</div> <!-- shipping address -->
+
+		{% if show_paypal %}
+			<script>
+				function submit_paypal() {
+					/* clear out CC info if entered */
+					$('#card_num').val('');
+					$('#card_code').val('');
+
+					/* and keep submitting */
+					return True;
+				}
+			</script>
+
+			<div>
+				<hr>
+			</div>
+		{% endif %}
+	</div> <!-- donation contact -->
+
+	<div id="donation-details" class="col">
+		{% autoescape off %}
+		{% endautoescape %}
+
+		<div id="product_list">
+			{% if has_products %}
+				<label id="products-label" class="ak-label-above">Product{% if products|length > 1 %}s{% endif %}</label>
+				
+				<table>
+					<tr id="product-table-headers">
+						<th id="product-quantity-header">Quantity</th>
+						<th id="product-details-header">Product</th>
+						<th id="product-amount-header">Price</th>
+					</tr>
+
+					{% for product in products %}
+						<tr>
+							<td class="product-quantity">
+								{% ifequal product.max 1 %}
+									<input type="checkbox" value="1" name="product_{{ product.id }}" id="product_{{ product.id }}" class="ak_product_inputs" onBlur="update_total()" onChange="update_total()">
+								{% else %}
+									<input type="text" name="product_{{ product.id }}" id="product_{{ product.id }}" size="2" class="ak_product_inputs" onBlur="update_total()" onChange="update_total()">
+								{% endifequal %}
+							</td>
+
+							<td class="product-details">
+								<div class="product-name">{{ product.name }}</div>
+
+								{% if product.desc %}
+									<div class="product-description">
+										{{ product.desc }}
+									</div>
+								{% endif %}
+							</td>
+
+							<td class="product-amount">
+								<span id="product_{{ product.id }}_price">{% ifequal product.price 0 %}FREE!{% else %}{{ product.amt|commify }}{% endifequal %}</span>
+							</td>
+						</tr>
+					{% endfor %}
+				</table>
+			{% endif %}
+		</div>
+
+		<div id="candidate_list">
+			{% if has_candidates %}
+				<label id="candidates-label" class="ak-label-above" for="amount">Candidate{% if candidates|length > 1 %}s{% endif %}</label>
+				
+				<table border="1">
+					<tr>
+						<th id="candidate-details-header">Candidate</th>
+						<th class="candidate-amount-header">Donation</th>
+					</tr>
+						
+					{% for candidate in candidates %}
+						<tr>
+							<td class="candidate-details">
+								{% if candidate.portrait_url %}
+									{% autoescape off %}
+										<img class="candidate-portrait" src="{{ candidate.portrait_url }}">
+									{% endautoescape %}
+								{% endif %}
+
+								<div class="candidate-name">
+									{{ candidate.name }}
+								</div>
+								
+								{% autoescape off %}
+										{{ candidate.desc }}
+								{% endautoescape %}
+							</td>
+
+							<td class="candidate-amount">
+								{{ page.currency_sym }}<input type="text" name="candidate_{{ candidate.id }}" id="candidate_{{ candidate.id }}" size="2" class="ak_candidate_inputs" onBlur="update_total()" onChange="update_total()">
+							</td>
+						</tr>
+					{% endfor %}
+				</table>
+			{% endif %}
+		</div>
+
+		{% if page.derived.use_account_switcher %}
+			<label class="ak-label-above ak-margin-none" for="amount">Currency:</label>
+			<span class="ak-currencies">
+				{% for currency, account_name in page.derived.currency_accounts %}
+					<span class="ak-currency">
+						<input type="radio" {% if forloop.first %}checked{% endif %} name="payment_account" id="id_currency_{{currency}}" value="{{account_name}}">
+						<label for="id_currency_{{currency}}">{{currency}}</label>
+					</span>
+				{% endfor %}
+			</span>
+		{% endif %}
+
+		<label class="ak-label-above ak-margin-none" for="amount">Donation Amount:</label>
+		<div id="amount_list" class="ak-err-above">
+			{% for row in amounts|columns:3 %}
+				<ul class="ak-pull-left ak-unstyled">
+					{% for amount in row %}
+						{% ifequal amount "other" %}
+							<li id="other_amount_container">
+								<noscript><input type="radio" value="" class="amount_radio_button" name="amount"></noscript>
+								<label for="amount_other_field" class="ak-btn">{{ page.currency_sym }} <input type="text" id="amount_other_field" name="amount_other" size="3" onKeypress="clear_radio_buttons();" onClick="update_total()" onBlur="update_total()" onChange="update_total()"></label>
+							</li>
+						{% else %}
+							<li>
+								<label for="id_amount_{{amount}}" class="ak-btn">
+									<input type="radio" id="id_amount_{{amount}}" value="{{ amount }}" class="amount_radio_button" name="amount" onClick="clear_other(); update_total()"  onBlur="update_total()" onChange="update_total()" {% if not args.amount_other and amount == default_amount %}checked{% endif %}>{{ page.currency_sym }}{{ amount|commify }}
+								</label>
+							</li>
+						{% endifequal %}
+					{% endfor %}
+				</ul>
+			{% endfor %}
+		</div>
+
+		{% if not has_products %}
+			{% if allow_monthly %}
+				<div id="type" class="ak-clear">
+					<label for="donation_type">Donation Type:</label>
+					<span><input type="radio" name="donation_type" id="id_donation_type_single" value="single" checked><label for="id_donation_type_single"> One-Time<label></span>
+					<span><input type="radio" name="donation_type" id="id_donation_type_recurring" value="recurring"><label for="id_donation_type_recurring"> Monthly</label></span>
+				</div>
+			{% else %}
+				<div id="type" class="ak-clear"></div>
+				<input type="hidden" name="donation_type" value="single">
+			{% endif %}
+		{% endif %}
+
+		<div id="total_div"></div>
+		
+		<script type="text/ak-template" for="total_div">
+			[% if (has_products || has_candidates) { %]
+				<p class="donation-total ak-clear"><label for="amount">Total Amount: <span id="total"></span></label>
+			[% } %]
+		</script>
+
+		<script>
+			$(document).ready(function() {
+				$('input[name="amount"], input#amount_other_field').click(function() {
+					$('label.ak-radio-checked').removeClass('ak-radio-checked'); 
+					$(this).parent('label').addClass('ak-radio-checked');
+				});
+			});
+		</script>
+
+		<div class="ak-labels-above ak-styled-fields">
+			{% if show_paypal %}
+				<div>
+					<input type="radio" name="paypal" value="0" id="pay_by_cc"> 
+					<label for="pay_by_cc" style="display: inline">Pay with Credit Card</label>
+				</div>
+
+				<input type="radio" name="paypal" value="1" id="pay_by_paypal" checked><label for="pay_by_paypal" style="display: inline;">
+				<img style="max-width: 150px" src="https://www.paypalobjects.com/webstatic/mktg/merchant/images/express-checkout-hero.png"></label>
+
+				<script>
+					function paypalradios() {
+						$(".ak-cc-box").addClass('ak-hide');
+
+						$("input[type='radio']").click(function() {
+							if ($("#pay_by_cc").is(':checked')) {
+								$(".ak-cc-box").slideDown();
+							}
+
+							if ($("#pay_by_paypal").is(':checked')) {
+								$(".ak-cc-box").slideUp();
+							}
+						});
+					}
+
+					$(document).ready(function() {
+						paypalradios();
+					});
+				</script>
+			{% endif %}
+
+			<div class="ak-cc-box ak-clear">
+				<div id="card_num_box" class="ak-err-below">
+					<label for="card_num">Credit Card #</label>
+					<input id="card_num" type="text" name="card_num">
+				</div>
+
+				<div class="ak-err-below">
+					<div id="card_code_box">
+						<label for="card_code">Verification Code</label>
+						<input id="card_code" type="text" name="card_code" size="4" />
+					</div>
+
+					<div id="exp_date_box">
+						<label for="exp_date_month">Expiration Date</label>
+
+						<select id="exp_date_month" type="text" name="exp_date_month">
+							<option value=""></option>
+							<option value="01">01</option>
+							<option value="02">02</option>
+							<option value="03">03</option>
+							<option value="04">04</option>
+							<option value="05">05</option>
+							<option value="06">06</option>
+							<option value="07">07</option>
+							<option value="08">08</option>
+							<option value="09">09</option>
+							<option value="10">10</option>
+							<option value="11">11</option>
+							<option value="12">12</option>
+						</select>
+
+						<select id="exp_date_year" type="text" name="exp_date_year">
+							<option value=""></option>
+							<option value="14">2014</option>
+							<option value="15">2015</option>
+							<option value="16">2016</option>
+							<option value="17">2017</option>
+							<option value="18">2018</option>
+							<option value="19">2019</option>
+							<option value="20">2020</option>
+							<option value="21">2021</option>
+							<option value="22">2022</option>
+							<option value="23">2023</option>
+							<option value="24">2024</option>
+							<option value="25">2025</option>
+						</select>
+					</div><!--expdatebox-->
+				</div><!--akerrbelow-->
+			</div><!--akccbox-->
+		</div><!--akstyledfields-->
+
+		{% if page.payment_processor_information.use_cse %}
+			<button disabled="true" type="submit" class="ak-styled-submit-button">Submit Donation</button>
+			
+			<noscript>
+				<p><b>JavaScript is required</b> so this page can securely submit your donation.</p>
+			</noscript>
+		{% else %}
+			<button type="submit" class="ak-styled-submit-button">Submit Donation</button>
+		{% endif %}
+
+		<div>{% include "./progress_meter.html" %}</div>
+	</div>
+</form>
+{% endcomment %}
+
+{% if pp.use_cse %}
+	<script src="https://js.braintreegateway.com/v1/braintree-data.js"></script>
+{% endif %}
+{% endblock %}

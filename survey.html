@@ -1,0 +1,42 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+
+{% block content %}
+
+<h2>{{ page.title }}</h2>
+
+
+<form class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+
+<div class="area ak-mobile-padding">{% include_tmpl form.introduction_text %}</div>
+
+<div id="survey-contact" class="col ak-styled-fields ak-styled-zip">
+{% include "./user_form_wrapper.html" %}
+</div>
+
+<div id="survey-questions" class="col ak-labels-above ak-styled-fields ak-styled-description ak-padding-top-none">
+{% autoescape off %}
+
+{% for question in form.surveyquestion_set.all %}
+   <div>
+    <label>{{ question.question_label }}</label>
+    {{ question.question_html }}
+   </div>
+{% endfor %}
+
+<button type="submit" class="ak-styled-submit-button">Submit Survey</button>
+
+
+<input type="hidden" name="page" value="{{ page.name }}">
+<input type="hidden" name="required" value="country">
+
+
+{% endautoescape %}
+
+{% include "./progress_meter.html" %}
+</div>
+
+</form>
+
+{% endblock %}
+
+

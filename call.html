@@ -1,0 +1,87 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+{% block content %}
+
+<h2>{{ page.title }}</h2>
+
+<form class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+
+<div id="call-story" class="col">
+
+{% autoescape off %}
+
+{% include_tmpl form.introduction_text %}
+
+{% endautoescape %}
+
+{% include "./progress_meter.html" %}
+
+</p>
+
+
+
+</div>
+
+<div id="call-form" class="col ak-styled-fields ak-border-left">
+
+<div id="need_contact_info"></div>
+<script type="text/ak-template" for="need_contact_info">
+[% if (incomplete) { %]
+<div>{% filter ak_text:"call_needs_contact_info" %}Fill out the form below so we can find the number for you to call.{% endfilter %}</div>
+[% } %]
+</script>
+
+{% include "./user_form_wrapper.html" %}
+
+
+<div id="what_to_say" class="ak-quote"></div>
+<script type="text/ak-template" for="what_to_say">
+[% if (!incomplete) { %]
+<div id="script_intro">Call and say:</div>
+{% include_tmpl form.script_text %}
+[% } 
+%]
+
+[% if (incomplete) { %]
+<style>
+#what_to_say {
+display: none;
+}
+</style>
+[% } 
+%]
+
+</script>
+
+
+<div id="who_called"></div>
+<script type="text/ak-template" for="who_called">
+[% if (!incomplete) { %]
+<br>
+<div>Who did you call?</div>
+[% } %]
+</script>
+
+<div id="target_checkboxes"></div>
+
+<div class="ak-labels-overlaid" id="ak-survey_question"></div>
+{% if form.survey_question_text %}
+<script type="text/ak-template" for="ak-survey_question">
+[% if (!incomplete) { %]
+{% autoescape off %}
+<label for="id_action_survey">{% include_tmpl form.survey_question_text %}</label>
+{% endautoescape %}
+<textarea id="id_action_survey" name="action_survey"></textarea>
+[% } %]
+</script>
+{% endif %}
+
+<input type="hidden" name="page" value="{{ page.name }}">
+
+<p style="clear: both;">
+<button type="submit" class="ak-styled-submit-button">Submit</button>
+
+</div>
+
+</form>
+
+{% endblock %}

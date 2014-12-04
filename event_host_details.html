@@ -1,0 +1,35 @@
+{% load actionkit_tags %}{% filter collapse_spaces %}
+<style type="text/css">
+.event-address label { float: left; white-space: pre; }
+.event-address-content { float: left; }
+.clear { clear: both; }
+.event-over-notice { color: red; }
+</style>
+{% if event.venue %}
+<div class="event-venue"><label>Venue: </label>{{ event.venue }}</div>
+{% endif %}
+{% if event.get_starts_at_display %}
+<div class="event-address"><label>Address:&nbsp;</label>
+    <div class="event-address-content">
+        <div class="event-address1">{{ event.address1 }}</div>
+        <div class="event-city-etc">{{ event.city_etc }}</div>
+    </div>
+</div>
+<div class="clear"></div>
+<div class="event-time"><label>When: </label>{{ event.get_starts_at_display }}{% if event.is_in_past %} <span class="event-over-notice">(event is now over)</span>{% endif %}</div>
+{% endif %}
+{% if event.public_description %}
+<div class="event-description"><label>Description: </label>{{ event.public_description }}</div>
+{% endif %}
+{% if event.directions %}
+<div class="event-directions"><label>Directions to event: </label>{{ event.directions }}</div>
+{% endif %}
+{% if event.note_to_attendees %}
+<div class="event-note-to-attendees"><label>Note to attendees: </label>{{ event.note_to_attendees }}</div>
+{% endif %}
+{% if event.campaign.allow_private %}
+<div class="event-privacy"><label>Event is {% if event.is_private %}private{% else %}public{% endif %}.</label></div>
+{% endif %}
+<div class="event-signup-link"><label>Signup link: </label> http://{% client_domain %}{{ event.public_url }}
+</div>
+{% endfilter %}

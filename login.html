@@ -1,0 +1,52 @@
+{% extends "./wrapper.html" %}
+
+{% block content %}
+
+<style type="text/css">
+#login-form label { display:inline-block; width:65px; }
+#login-form .form-row, #login-form .submit-row { padding: 5px 0; }
+#id_email,  #id_password { width:14em; }
+</style>
+
+<h2>Log in</h2>
+
+<div class="area">
+{% if error_message %}
+<p class="errornote">{{ error_message }}</p>
+{% endif %}
+{% if invalid %}
+<p class="errornote">Incorrect e-mail or password.  Try again, or <a href="/forgot/?next={{ next }}&email={{ email }}">we can e-mail you a link to reset your password</a>.</p>
+{% endif %}
+
+
+<div id="content-main">
+{% if no_password %}
+<p>It looks like you've never logged in before. <a href="/forgot/?email={{ email }}">Click here to set up a password.</a>.
+{% endif %}
+{% if wrong_account %}
+<p>It looks like you may need another e-mail address to view that page, or the page may no longer be accessible.</p>
+{% endif %}
+<form action="{{ app_path }}" method="post" id="login-form">
+  <div class="form-row">
+    <label for="id_email">E-mail</label> <input type="text" name="email" value="{{ email }}" id="id_email" />
+  </div>
+  <div class="form-row">
+    <label for="id_password">Password</label> <input type="password" name="password" id="id_password" />
+    <input type="hidden" name="this_is_the_login_form" value="1" />
+    <input type="hidden" name="next" value="{{ next }}" />
+  </div>
+  <div class="submit-row">
+    <button type="submit">Log In</button>
+  </div>
+
+<div class="ak-clear"><a href="/forgot/?next={{ next }}&email={{ email }}">Forgot your password?</a></div>
+<div><a href="/forgot/?next={{ next }}&first=1&email={{ email }}">Never logged in before?</a></div>
+
+</form>
+</div>
+
+<script type="text/javascript">
+document.getElementById('id_{% if email %}password{% else %}email{% endif %}').focus()
+</script>
+</div>
+{% endblock %}

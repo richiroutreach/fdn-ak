@@ -1,0 +1,46 @@
+{% load actionkit_tags smartif %}
+
+<a name="contact{% if to %}-{{to}}{% endif %}"></a>
+<fieldset class="ak-nodisplay-if-js contact-form contact{% if to %}-{{to}}{% endif %}">
+<legend>E-mail {% ifequal to 'attendees' %}attendee{% else %}co-host{% endifequal %}(s)</legend>
+{% ifnotequal need_form 'no' %}
+<form name="contact{% if to %}-{{to}}{% endif %}" method="post" action="/event/{{ campaign.local_name }}/{{ event.id }}/contact/" accept-charset="utf-8">
+<input type="hidden" name="page" value="{{ page.name }}">
+<input type="hidden" name="akid" value="{{ args.akid }}">
+<input type="hidden" name="form_name" value="contact{% if to %}-{{to}}{% endif %}">
+
+<div id="ak-confirmation">
+Sent!  If you like, you can send more messages below.
+</div>
+
+{% endifnotequal %}
+
+<div class="event-contact-headers">
+<div>
+<label>From:</label>
+You (<span class="header-from header-val">{{ user.name }}</span>)
+</div>
+<div>
+<label>To:</label>
+<span class="header-to header-val">
+{% ifequal signup.role 'attendee' %}
+Your event host
+{% else %}
+<span class="if-js to-count">{{signups|length}}</span> 
+{% ifequal to 'attendees' %}attendee{% else %}co-host{% endifequal %}{% if signups|length > 1 %}(s) <span class="check-recipients-help">(you can check off specific recipient(s) above)</span>{% endif %}
+{% endifequal %}
+</span>
+</div>
+</div>
+<div class="event-contact-body">
+<label>Your message (required):</label>
+<textarea name="body"></textarea>
+<input name="send_email" value="Send" type="submit" /> <input type="submit" name="cancel" value="Cancel" onclick="window.location.reload(); return false;" />
+
+</div>
+
+{% ifnotequal need_form 'no' %}
+<input type="hidden" name="required" value="body">
+</form>
+{% endifnotequal %}
+</fieldset>

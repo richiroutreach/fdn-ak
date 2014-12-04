@@ -1,0 +1,40 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+
+{% block content %}
+
+<form class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+
+<h2>{{ page.title }}</h2>
+
+<div id="letter-form" class="col border">
+
+
+{% include "./user_form_wrapper.html" %}
+
+{% include "./inline_tellafriend.html" %}
+<input type="hidden" name="page" value="{{ page.name }}">
+
+<button type="submit">Send Letter</button>
+
+
+
+</div>
+
+<div id="letter-story" class="col">
+
+{% autoescape off %}
+
+<div class="box">{% if form.statement_leadin %}{% include_tmpl form.statement_leadin %} {% endif %}
+<textarea id="id_comment" name="action_comment" style="">{% include_tmpl form.letter_text escaped %}</textarea>
+</div>
+
+<div>{% include_tmpl form.about_text %}</div>
+
+{% endautoescape %}
+
+{% include "./progress_meter.html" %}
+</div>
+
+</form>
+
+{% endblock %}

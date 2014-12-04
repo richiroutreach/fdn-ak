@@ -1,0 +1,20 @@
+{% extends "./wrapper.html" %}
+{% block content %}
+{% ifequal signups.count 0 %}
+<h2>You aren't signed up for any events</h2>
+<div><a href="/event/{{ campaign.local_name }}/">Search for an event here</a></div>
+{% else %}
+<h2>Please choose an event below.</h2>
+
+<ul>
+{% for signup in signups %}
+<li>
+<a href="{{ signup.url }}">{{ signup.event.title }} &mdash; {{ signup.event.get_starts_at_display }}</a>
+{% ifequal signup.role 'host' %}
+&nbsp;(you are hosting)
+{% endifequal %}
+</li>
+{% endfor %}
+</ul>
+{% endifequal %}
+{% endblock %}

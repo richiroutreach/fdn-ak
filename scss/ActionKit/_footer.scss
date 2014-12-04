@@ -6,9 +6,13 @@
 	color: $green;
 
 	a {
+		text-decoration: underline;
 		color: $green;
 		font-weight: bold;
-		text-decoration: none;
+
+		&:hover {
+			color: darken($green, 10);
+		}
 	}
 
 	.footer-right {

@@ -1,0 +1,102 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+
+{% block content %}
+{% if signup and not event.is_inactive %}
+<style type="text/css">
+h2 { margin-bottom: 6pt; }
+h3 { margin-top: 10pt; }
+.bar h3 { margin-top: -3pt; margin-bottom: 8pt; }
+.bar, fieldset { border: solid #ccc 1px; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+.bar ul { margin-bottom: 0px; }
+.warning { color: red; }
+.js .ak-nodisplay-if-js { display: none; }
+#event-attendee-details { line-height: 140%; float: left; }
+#contact { margin-top: 10px; margin-left: -11px; }
+#map { margin-bottom: 18px; }
+#map img { border: solid black 1px; }
+#map .caption { color: #777; font-style: italic; text-align: center; }
+#id_act { width: 460px; }
+.directions-form { margin-left: auto; margin-right: auto; text-align: center; }
+.event-attendee-sidebar { padding: 0px; margin-right: 0px; }
+</style>
+
+<!-- Title -->
+<!-- Sidebar -->
+
+{% if campaign.use_title %}
+<h2>Event: {{ event.title }}</h2>
+{% else %}
+<h2>Event: {{ campaign.local_title }}</h2>
+{% endif %}
+
+<div class="span-12 col">
+
+{% if campaign.use_title %}
+<h3>{{ campaign.local_title }}</h3>
+{% endif %}
+
+<!-- Message from mothership -->
+<div id="attendee-tools-intro">
+{{ form.tools_text|safe }}
+</div>
+
+<div id="event-attendee-details">
+{% include "./event_attendee_details.html" %}
+</div>
+
+<br style="clear: left;" />
+
+<h3>Event tools</h3>
+<ul id="event-attendee-links">
+    {{ form.tools_sidebar|safe }}
+    <li><a href="../signup/?akid={{ args.akid }}&action_id={{ action.id }}&update=1">Update contact info</a></li>
+    <li><a href="../cancel_signup/?akid={{ args.akid }}">Cancel signup</a></li>
+    <li class="narrower"><a href="#" onclick="$('fieldset.contact').slideDown('slow'); $(this).before(this.firstChild)">E-mail host</a>
+        {% include "./event_contact.html" %}
+    </li>
+</ul>
+
+</div>
+
+<div class="event-attendee-sidebar span-8 col">
+<div id="map">
+    <img src="http://maps.google.com/maps/api/staticmap?sensor=false&size=300x300&markers={{ event.address1|urlencode }}, {{ event.city_etc|urlencode }}" width="300" height="300" />
+<form class="directions-form" action="http://maps.google.com/maps/" method="get">
+<input size=26 type="text" name="saddr" value="Enter your street address" style="color: #777;" onfocus="this.style.color='black'; if(this.value=='Enter your street address') this.value='';" />
+<input type="hidden" name="daddr" value="{{ event.address1 }}, {{ event.city_etc }}" />
+<button type="submit">Get Directions</button>
+</form>
+</div>
+{% if event.is_open_for_signup %}
+{% include "./event_invite.html" %}
+{% endif %}
+</div>
+
+{% else %}
+{% if event.is_inactive %}
+<h2>Sorry, this event has been cancelled.</h2>
+{% endif %}
+{% if not signup %}
+{% comment %}
+    This message also shows if you were removed by the host.
+{% endcomment %}
+{% if args.cancel_success %}
+<h2>Your signup was cancelled successfully.</h2>
+{% else %}
+<h2>You aren't currently signed up for this event.</h2>
+
+<p>If you think this is a mistake, check that you cut-and-pasted the entire link to this page.</p>
+{% endif %}
+{% endif %}
+<div><a href="/event/{{ campaign.local_name }}/?akid={{args.akid}}&zip={{args.zip}}">Search for another event</a></div>
+{% endif %}
+
+{% endblock %}
+
+
+{% block below_form %}
+<script type="text/javascript">
+actionkit.forms.contextRoot = '/context/';
+actionkit.forms.initTafForm('taf');
+</script>
+{% endblock %}

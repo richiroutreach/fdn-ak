@@ -1,0 +1,50 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+
+{% block description %}{{ form.search_page_text|striptags }}{% endblock %}
+
+{% block content %}
+<style type="text/css">
+ul.events li.event { list-style-type: none; }
+#map { 
+    float: right;
+    width: 300px;
+}
+#map img { border: solid black 1px; }
+#map .caption { color: #777; font-style: italic; text-align: center; }
+#id_act { width: 460px; }
+select#country { width: 200px; }
+</style>
+<div class="event-search">
+
+<!-- no class=ak-form because we don't need to wait for context to show this -->
+<form name="act" method="GET" action="" accept-charset="utf-8" onsubmit="actionkit.forms.eventSearch(this); return false;">
+
+<h2>{{ page.title }} - Find an Event</h2>
+{% if form.search_page_text %}<div class="area">{{ form.search_page_text|safe }}</div>{% endif %}
+
+<ul class="compact" id="ak-errors"></ul>
+
+<input type="hidden" name="page" value="{{ page.name }}">
+<input type="hidden" name="template" value="event_search.html">
+<input type="hidden" name="akid" value="{{ args.akid }}">
+<input type="hidden" name="distance" value="50">
+<input type="hidden" name="limit" value="10">
+
+<div class="area">
+<label for="id_zip">{% if form.templateset.is_intl %}Postcode{% else %}ZIP{% endif %} or City:</label>
+<input type="text" name="place" value={% if args.place %}{{args.place}}{% else %}{{args.zip}}{% endif %}>
+{% if form.templateset.is_intl %}
+Country: {% include "./country_select.html" %}
+{% endif %}
+<button type="submit">Search</button>
+</div>
+</form>
+
+
+<div id="event-search-results">
+{% if args.page %}
+{% include "./event_search_results.html" %}
+{% endif %}
+</div>
+</div>
+{% endblock %}

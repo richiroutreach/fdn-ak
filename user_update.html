@@ -1,0 +1,36 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+
+{% block title %}Update an account{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="/css/blueprint/src/forms.css" type="text/css" media="screen, projection" />
+<style type="text/css">
+    label { display: inline-block; width: 10em }
+    input { width: 25em; }
+</style>
+
+{% if user %}
+<p class="area">You are logged in as {{ user.name }}. <a href="/logout">Log out</a></p>
+{% endif %}
+  
+{% if updated %}
+<p>Thanks! We've updated your information.</p>
+{% endif %}
+
+<form name="accountupdate" method="POST">
+    
+    <fieldset>
+        
+        <legend>Update an account</legend>
+        
+        {{ form.as_p }}
+        
+        <button type="submit">Submit</button>
+        
+        </fieldset>
+    
+    </form>
+
+{% endblock content %}
+

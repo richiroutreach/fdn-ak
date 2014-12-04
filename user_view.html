@@ -1,0 +1,58 @@
+{% extends './wrapper.html' %}
+
+{% block content %}
+
+<h1>{{ actionkit_user.name }}</h1>
+<a href="/logout/">Logout</a></p>
+
+{% if messages %}
+<ul class="messages">
+{% for message in messages %}
+<li>{{ message }}
+{% endfor %}
+</ul>
+{% endif %}
+
+<div><b>{{ actionkit_user.email }}</b></div>
+
+<address>
+{{ actionkit_user.address1 }}
+{{ actionkit_user.address2 }}
+{{ actionkit_user.city }}, {{ actionkit_user.state }} {{ actionkit_user.zip }}
+{{ actionkit_user.country }}
+</address>
+
+<div><a href="update/">Update your email or address.</a></div>
+
+<h2> Subscription History </h2>
+
+<ul>
+{% for subscription in actionkit_user.subscription_history %}
+<li>{{ subscription.list.name }}, {{ subscription.change.name }}, at {{ subscription.created_at|date:"m/d/Y" }}
+{% endfor %}
+</ul>
+
+{% if actionkit_user.is_subscribed %}
+<div><a href="/cms/unsubscribe/unsubscribe/?akid={{ actionkit_user.token }}">Unsubscribe</a></div>
+{% endif %}
+
+{% if recurring_donations %}
+<h2> Your Recurring Donations </h2>
+<ul>
+{% for profile in recurring_donations %}
+<li>{{ profile.amt }} a {{ profile.inverse_period_display|lower }}, started on {{ profile.created_at|date:"m/d/Y" }}. You've given a total of {{ profile.payment_total_amt }}. {% if profile.is_active %}<a href="/cms/pledge/update/update/">Update your credit card</a> or <a href="/cms/pledge/cancel/monthly/">cancel at any time.</a> {% else %} <b>{{ profile.get_status_display }} on {{ profile.updated_at|date:"m/d/Y" }} </b>{% endif %}
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if donations %}
+<h2> Donation History </h2>
+<ul>
+{% for donation in donations %}
+<li>{{ donation.amt }} on {{ donation.created_at|date:"m/d/Y" }}  {% if donation.recurring %} (Recurring) {% endif %}
+{% endfor %}
+</ul>
+{% endif %}
+
+
+{% endblock %}

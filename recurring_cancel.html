@@ -1,0 +1,55 @@
+{% extends "./wrapper.html" %}{% load actionkit_tags %}
+
+{% block content %}
+
+<div class="area" id="recurring-cancel">
+
+<h2>{{ page.title }}</h2>
+
+<div>
+<p id="unknown_user"></p>
+<p id="known_user"></p>
+<p>Logged in as {{ logged_in_user.name }}. <a href="/logout/">Log out</a></p>
+</div>
+
+{% if active %}
+{% for profile in active %}
+
+{% autoescape off %}
+
+<p>{% include_tmpl form.please_stay_text %}</p>
+
+{% endautoescape %}
+
+
+<form class="action_form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+
+<ul class="compact" id="ak-errors"></ul>
+
+{% include "./recurring_info.html" %}
+
+<input type="hidden" name="akid" value="{{ logged_in_user.token }}">
+<input type="hidden" name="page" value="{{ page.name }}">
+<input type="hidden" name="profile_id" value="{{ profile.id }}">
+
+<div><button type="submit">Cancel</button></div>
+
+</form>
+
+{% endfor %}
+{% else %}
+
+<p>You don't have any active recurring donations.</p>
+
+{% comment %}
+We have to have a form, or the JavaScript doesn't work.
+{% endcomment %}
+<form class="action_form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+<ul class="compact" id="ak-errors"></ul>
+<input type="hidden" name="page" value="{{ page.name }}">
+</form>
+
+{% endif %}
+</div>
+
+{% endblock %}

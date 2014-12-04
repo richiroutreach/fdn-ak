@@ -1,0 +1,83 @@
+{% load actionkit_tags smartif %}{% filter collapse_spaces %}
+{% comment %}
+This file is so long because you can choose whether your campaign uses
+event titles, venues, etc., and different choices produce different HTML.  
+
+The field that's linked in each search result is the first of these
+that's defined:
+
+    1. Title
+    2. Venue
+    3. Distance
+    4. Campaign name
+{% endcomment %}
+
+{% if events|is_defined %}
+<input type="hidden" id="id_have_events" name="have_events" value="1">
+{% if not events|length %}
+<h2>No events found.</h2>
+{% else %}
+
+{% if campaign.show_address1 and not hide_map %}
+<div id="map">
+    <img src="http://maps.google.com/maps/api/staticmap?sensor=false&size=300x300&markers={% for event in events %}{{ event.address1|urlencode }}, {{ event.city_etc|urlencode }}{% if not forloop.last %}|{% endif %}{% endfor %}" width="300" height="300" />
+</div>
+{% endif %}
+<ul class="events">
+{% for event in events %}
+<li class="event">
+{% if campaign.use_title and campaign.show_title %}
+    <a href="/event/{{ campaign.local_name }}/{{event.id}}/signup/?akid={{args.akid}}&zip={{args.zip}}" class="event-title">{{ event.title }}</a>
+    {% if campaign.show_venue and event.venue %}
+    <div class="event-venue">{{ event.venue }}</div>
+    {% endif %}
+    {% if event.distance|is_nonblank %}
+    <div class="event-distance">{{ event.distance_str }} away</a>
+    {% endif %}
+{% else %}
+    {% if campaign.show_venue and event.venue %}
+    <a href="/event/{{ campaign.local_name }}/{{event.id}}/signup/?akid={{args.akid}}&zip={{args.zip}}" class="event-venue">{{ event.venue }}</a>
+    {% if event.distance|is_nonblank %}
+    <div class="event-distance">{{ event.distance_str }} away</div>
+    {% endif %}
+    {% else %}
+    {% if event.distance|is_nonblank %}
+    <a href="/event/{{ campaign.local_name }}/{{event.id}}/signup/?akid={{args.akid}}&zip={{args.zip}}" class="event-distance">{{ event.distance_str }} away</a>
+    {% else %}
+    <a href="/event/{{ campaign.local_name }}/{{event.id}}/signup/?akid={{args.akid}}&zip={{args.zip}}" class="campaign-title">{{ campaign.local_title }}</a>
+    {% endif %}
+    {% endif %}
+{% endif %}
+{% if campaign.show_address1 %}
+    <div class="event-address1">{{ event.address1 }}</div>
+{% endif %}
+{% if campaign.show_city or campaign.show_state or campaign.show_zip %}
+    {% if campaign.show_zip %}
+    <div class="event-city-etc">{{ event.city_etc }}</div>
+    {% else %}
+    <div class="event-city-etc">{{ event.city_etc_no_postal }}</div>
+    {% endif %}
+{% endif %}
+<div class="event-time">{{ event.starts_at }}</div>
+{% if campaign.show_public_description %}
+<div class="event-description">Description: {{ event.public_description }}</div>
+{% endif %}
+{% if campaign.show_directions %}
+<div class="event-directions">Directions: {{ event.directions }}</div>
+{% endif %}
+{% if campaign.show_attendee_count %}
+<div class="event-attendee-count">{{ event.attendee_count }} attendee{{ event.attendee_count|pluralize }}</div>
+{% endif %}
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endif %}
+{% if errors|length %}
+<ul class="compact" id="ak-errors">
+{% for key,val in errors.items %}
+<li>{{ val|nth:0 }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endfilter %}
