@@ -1,0 +1,14 @@
+@mixin nice-button($color) {
+	background: $color;
+	display: inline-block;
+	margin: 0 0.5rem;
+	border-radius: 5px;
+	color: white;
+	border: 1px solid darken($color, 10);
+	font-size: 1.15rem;
+
+	&:hover {
+		background: darken($color, 10);
+		border-color: darken($color, 20);
+	}
+}

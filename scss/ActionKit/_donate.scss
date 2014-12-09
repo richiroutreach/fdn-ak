@@ -83,28 +83,11 @@ form .row.background {
 
 	.button {
 		&.next, &.prev, &.submit {
-			background: $green;
-			display: inline-block;
-			margin: 0 0.5rem;
-			border-radius: 5px;
-			color: white;
-			border: 1px solid darken($green, 10);
-			font-size: 1.15rem;
+			@include nice-button($green);
+		}
 
-			&:hover {
-				background: darken($green, 10);
-				border-color: darken($green, 20);
-			}
-
-			&.secondary {
-				background: $blue;
-				border-color: darken($blue, 10);
-
-				&:hover {
-					background: darken($blue, 10);
-					border-color: darken($blue, 20);
-				}
-			}
+		&.secondary {
+			@include nice-button($blue);
 		}
 	}
 }
@@ -255,8 +238,8 @@ form .row.background {
 			display: none;
 			position: absolute;
 			padding: $column-gutter / 2;
-			background: rgba(#000, 0.75);
-			color: $red;
+			background: rgba(#000, 0.95);
+			color: lighten($red, 20);
 			width: rem-calc(250) + ($column-gutter);
 		}
 	}

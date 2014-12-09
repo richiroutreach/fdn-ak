@@ -43,7 +43,7 @@
 	<script src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/js/modernizr.js"></script>
 </head>
 
-<body class="{{ filename|split:'.'|nth:0 }}-page lang-{{page.lang.iso_code|default:"unknown"}}{% if page.lang.is_rtl %} ak-rtl{% endif %} ak-no-js">
+<body class="{{ filename|split:'.'|nth:0 }}-page lang-{{page.lang.iso_code|default:"unknown"}}{% if page.lang.is_rtl %} ak-rtl{% endif %} ak-no-js {{ page.type }}">
 	<!-- Required AK JS -->
 	<script type="text/javascript">actionkit.forms.initPage()</script>
 
@@ -107,19 +107,14 @@
 	</div> <!-- .container -->
 
 	{% if analytics_key %}
-		<script type="text/javascript">
-			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', '{{ analytics_key }}']);
-			_gaq.push(['_trackPageview']);
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-			(function() {
-				var ga = document.createElement('script'); ga.type = 'text/javascript';
-				ga.async = true;
-				ga.src = ('https:' == document.location.protocol ? 'https://ssl' :
-					'http://www') + '.google-analytics.com/ga.js';
-				var s = document.getElementsByTagName('script')[0];
-				s.parentNode.insertBefore(ga, s);
-			})();
+			ga('create', '{{ analytics_key }}', 'auto');
+			ga('send', 'pageview');
 		</script>
 	{% endif %}
 
@@ -129,6 +124,30 @@
 	<script>
 		// Initalize Foundation
 		$(document).foundation();
+
+		$(document).ready(function() {
+			// Send GA Event Tracking Info
+			ga('send', 'event', 'View', 'Template Used', 'Foundation Templateset');
+
+			ga('send', 'event', 'View', 'Type', '{{ page.type }}');
+
+			// Determine if we are on the thank you page or not
+			{% if filename|split:'.'|nth:0 == "thanks" %}
+				ga('send', 'event', 'View', 'Step', 'Completed ({{ page.type }})');
+				ga('send', 'event', 'View', 'Step', 'Completed ({{ page.id }})');
+
+				{% if user.email %}
+					ga('send', 'event', 'View', 'User', 'Completed ({{ user.email }} on {{ page.id }})');
+				{% endif %}
+			{% else %}
+				ga('send', 'event', 'View', 'Step', 'Ask ({{ page.type }})');
+				ga('send', 'event', 'View', 'Step', 'Ask ({{ page.id }})');
+
+				{% if user.email %}
+					ga('send', 'event', 'View', 'User', 'Ask ({{ user.email }} on {{ page.id }})');
+				{% endif %}
+			{% endif %}
+		});
 	</script> 
 </body>
 </html>

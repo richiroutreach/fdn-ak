@@ -97,6 +97,9 @@
 				total += parseFloat(other);
 		}
 
+		// Set the amount so GA can easily get it
+		$('#ga-amount').val(total.toFixed(2));
+
 		var new_total = total == 0 ? "" : "$" + total.toFixed(2);
 
 		if (new_total != $('#total').html()) {
@@ -162,7 +165,49 @@
 {% comment %}
 	/*
 		---------------------------------------------------------------------
-			Start Staged Donation Form
+			Google Analytics Tracking - Start
+		---------------------------------------------------------------------
+	*/
+{% endcomment %}
+<script>
+	$(document).ready(function() {
+		// Set up tracking events on form submit
+		$('#act').submit(function() {
+			if( $(this).valid() ) {
+				ga('send', 'event', 'Submission Attempt', 'Amount', $('#ga-amount').val());
+				ga('send', 'event', 'Submission Attempt', 'Type', $('input[name="donation_type"]:checked').val());
+
+				{% if user.email %}
+					ga('send', 'event', 'Submission Attempt', 'User', '{{ user.email }} for $' + $('#ga-amount').val() + '(' + $('input[name="donation_type"]:checked').val() + ')');
+				{% endif %}
+
+			}
+		});
+
+		// Set up tracking for donation type change
+		$('input[name="donation_type"]').change(function() {
+			if( $(this).is(':checked') ) {
+				ga('send', 'event', 'Form Interaction', 'Change Donation Type', $(this).val());
+
+				{% if user.email %}
+					ga('send', 'event', 'Form Interaction', 'User', 'Type Changed (' + $(this).val() + ')' );
+				{% endif %}				
+			}
+		});
+	});
+</script>
+{% comment %}
+	/*
+		---------------------------------------------------------------------
+			Google Analytics Tracking - End
+		---------------------------------------------------------------------
+	*/
+{% endcomment %}
+
+{% comment %}
+	/*
+		---------------------------------------------------------------------
+			Staged Donation Form - Start
 		---------------------------------------------------------------------
 	*/
 {% endcomment %}
@@ -179,6 +224,25 @@
 	}
 
 	$(document).ready(function() {
+		/*
+			---------------------------------------------------------------
+				Resubmission - If this is a resubmission, go to page 3
+			---------------------------------------------------------------
+		*/
+
+		var page_to_show = 1;
+
+		if ( window.location.href.indexOf("error_amount") >= 0) {
+			page_to_show = 2;
+		} else if( window.location.href.indexOf("error_card_num") >= 0) {
+			page_to_show = 4;
+		} 
+
+		if(page_to_show > 1) {
+			$('.page-1').hide();
+			$('.page-' + page_to_show).show();
+		}
+
 		/*
 			---------------------------------------------------------------
 				Fancy Radio Button Code
@@ -204,10 +268,10 @@
 			---------------------------------------------------------------
 		*/
 		$('.next').click(function() {
+			var page = $(this).data('page');
+			var button = $(this);
+		
 			if($('#act').valid()) {
-				var page = $(this).data('page');
-				var button = $(this);
-				
 				$(button).prop('disabled', true);
 
 				$('.page-' + (page - 1)).fadeOut(300, function() {
@@ -215,6 +279,18 @@
 						$(button).prop('disabled', false);
 					});
 				});
+
+				ga('send', 'event', 'Form Interaction', 'Next Pressed', (page - 1));
+
+				{% if user.email %}
+					ga('send', 'event', 'Form Interaction', 'User', 'Next Pressed ({{ user.email }} on ' + (page - 1) + ')');
+				{% endif %}
+			} else {
+				ga('send', 'event', 'Form Interaction', 'Validation Failure', (page - 1));
+
+				{% if user.email %}
+					ga('send', 'event', 'Form Interaction', 'User', 'Validation Failure ({{ user.email }} on ' + (page - 1) + ')');
+				{% endif %}
 			}
 		});
 
@@ -229,6 +305,13 @@
 					$(button).prop('disabled', false);
 				});
 			});
+
+			ga('send', 'event', 'Form Interaction', 'Back Pressed', (page + 1));
+
+			{% if user.email %}
+				ga('send', 'event', 'Form Interaction', 'User', 'Back Pressed ({{ user.email }} on ' + (page + 1) + ')');
+			{% endif %}
+
 		});
 
 		/*
@@ -332,6 +415,14 @@
 				Validation
 			---------------------------------------------------------------
 		*/
+
+		// Custom validation function because the default email validator
+		// isn't as strict as the default AK one. See actionkit.js for source.
+		jQuery.validator.addMethod('akemail', function(value, element) {
+			var regex = !/^\s*\S+@\S+\.\S+\s*$/;
+			return this.optional(element) || /^\s*\S+@\S+\.\S+\s*$/.test(value);
+		}, "Invalid email address.");
+
 		$('#act').validate({
 			rules: {
 				amount: {
@@ -339,7 +430,8 @@
 				},
 
 				amount_other: {
-					require_from_group: [1, '.amount-list']
+					require_from_group: [1, '.amount-list'],
+					min: 1
 				},
 
 				name: {
@@ -348,7 +440,8 @@
 
 				email: {
 					required: true,
-					email: true
+					email: true,
+					akemail: true
 				},
 
 				address1: {
@@ -364,11 +457,15 @@
 					zipcodeUS: true
 				},
 
+				postal: {
+					required: true
+				},
+
 				state: {
 					required: true
 				},
 
-				card_num: {
+				card_numx: {
 					required: true,
 					creditcard: true
 				},
@@ -396,7 +493,8 @@
 				},
 
 				amount_other: {
-					require_from_group: 'Select an amount.'
+					require_from_group: 'Select an amount.',
+					min: 'Donations below $1.00 are not allowed.'
 				},
 
 				name: {
@@ -423,6 +521,10 @@
 				zip: {
 					required: 'Enter a valid ZIP code.',
 					zipcodeUS: 'Enter a valid zip code.'
+				},
+
+				postal: {
+					required: 'Enter your postal code.'
 				},
 
 				card_num: {
@@ -465,6 +567,7 @@
 <form id="act" name="act" class="staged {% if page.payment_processor_information.use_tr %}braintree_form{% endif %}" method="POST" action="/act/" accept-charset="utf-8">
 	<input type="hidden" name="orig_akid" value="{{ akid }}">
 	<input type="hidden" name="page" value="{{ page.name }}">
+	<input type="hidden" name="ga-amount" id="ga-amount" value="0">
 	
 	{% if not page.allow_international %}
 		<input type="hidden" name="country" value="United States">

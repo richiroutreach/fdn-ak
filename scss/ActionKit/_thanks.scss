@@ -1,0 +1,115 @@
+.thank-you-text {
+	margin-top: 2rem;
+}
+
+.sharebox {
+	padding: 1rem !important; // Would take a lot of override this
+	display: table;
+	box-shadow: 1px 1px 10px #888;
+	margin-bottom: 2rem;
+	text-align: center;
+
+	.text {
+		display: table-cell;
+		vertical-align: middle;
+		padding-left: 1rem;
+	
+		h4 {
+			font-size: 1.15rem;
+			color: $facebook-blue; 
+			margin: 0;
+			margin-bottom: 0.25rem;
+			font-weight: bold;
+		}
+
+		.tweet-text {
+			margin-bottom: 0.5rem;
+			background: #fafafa;
+			border: 1px solid #aaa;
+			font-size: 14px;
+			padding: 0.25rem 0.5rem;
+			text-align: left;
+		}
+	}
+
+	.fa {
+		font-size: 4rem;
+		display: table-cell;
+		vertical-align: top;
+
+		&.fa-facebook-square {
+			color: $facebook-blue;
+		}
+
+		&.fa-twitter-square {
+			color: $twitter-blue;
+		}
+	}
+
+	.share-button {
+		display: block;
+		padding: 0.25rem;
+		text-align: center;
+		background: $green;
+		box-shadow: 1px 1px 5px #aaa;
+		color: white;
+		text-transform: uppercase;
+		border: 1px solid white;
+		border-radius: 5px;
+
+		&:hover {
+			background-color: darken($green, 10);
+		}
+	}
+}
+
+.diy-email {
+	.button {
+		@include nice-button($green);
+
+		padding: 1rem;
+	}
+}
+
+.ak-email {
+	.button {
+		@include nice-button($blue);	
+
+		padding: 1rem;
+	}
+}
+
+.taf-email-form {
+	margin-top: 2rem;
+	padding: 1rem;
+	box-shadow: 1px 1px 10px #888;
+	background: rgba(lighten($blue, 25), 0.15);
+
+	& > div {
+		margin-bottom: 1rem;
+
+		&:last-child {
+			margin: 0;
+		}
+	}
+
+	label {
+		font-weight: bold;
+	}
+
+	#id_taf_body, #id_taf_subject {
+		background: #fafafa;
+		border: 1px solid #aaa;
+		font-size: 14px;
+		padding: 0.25rem 0.5rem;
+		overflow: hidden;
+
+		.taf-body {
+			white-space: pre-wrap;
+		}
+	}
+
+	.button {
+		@include nice-button($green);
+	}
+}
