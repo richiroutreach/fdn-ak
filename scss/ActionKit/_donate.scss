@@ -244,3 +244,65 @@ form .row.background {
 		}
 	}
 }
+
+@media #{$small-only} {
+	.form-column {
+		padding-top: 1rem;
+		min-height: 0;
+	}
+	
+	.splash-layout {
+		.user-form {
+			select {
+				margin-bottom: 1rem;
+			}
+		}
+
+		.amount-other label.radio {
+			font-size: 1rem;
+		}
+
+		.form-error-box-wrapper {
+			margin: 0;
+			padding: 0;
+
+			img {
+				display: none;
+			}
+
+			#ak-errors {
+				position: relative;
+				margin: 0;
+				width: 100%;
+				border: 2px solid #ff3030;
+			}
+		}
+	}
+
+	.page-buttons  {
+		.button.next, .button.prev, .button.secondary {
+			width: 40%;
+
+			&.large {
+				width: 100%;
+			}
+		}
+	}
+
+	.alternate-methods {
+		.button {
+			width: 45%;
+			padding-left: 0;
+			padding-right: 0;
+			margin: 0;
+		}	
+	}
+}
+
+@media #{$medium-only} {
+	.alternate-methods {
+		.button.paypal {
+			margin-bottom: 1rem;
+		}
+	}
+}

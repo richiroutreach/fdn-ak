@@ -47,64 +47,89 @@
 	<!-- Required AK JS -->
 	<script type="text/javascript">actionkit.forms.initPage()</script>
 
-	<div class="container">
-		<div class="header-wrapper row">
-			<div id="header" class="large-12 columns">
-				<h1 class="hidden">Food Democracy Now!</h1>
-				<img src="https://s3.amazonaws.com/Food_Democracy_Now/images/header.png" alt="Logo" title="Food Democracy Now!" class="hide-for-small">
-				<img src="https://s3.amazonaws.com/Food_Democracy_Now/images/mobile-head.png" alt="Logo" title="Food Democracy Now!" class="show-for-small">  
-			</div> <!-- #header -->
+	<div class="off-canvas-wrap" data-offcanvas>
+		<div class="inner-wrap">
+			<nav class="mobile-nav-toggle">
+				<a class="left-off-canvas-toggle menu-icon" href="#"><span></span></a>
+			</nav> <!-- .mobile-nav-toggle -->
 
-			<div id="navigation" class="large-12 columns">
-				<nav class="top-bar" data-topbar role="navigation">
-					<ul class="title-area">
-						<li class="name show-for-small">{% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}</li>
-						<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
-					</ul> <!-- .title-area -->
+			<!-- Off Canvas Menu -->
+			<aside class="left-off-canvas-menu">
+				<!-- whatever you want goes here -->
+				<ul class="off-canvas-list">
+					<li><a href="#">Campaigns</a></li>
+					<li><a href="#">Blog</a></li>
+					<li><a href="#">Press</a></li>
+					<li><a href="#">About</a></li>
+					<li><a href="#">Shirts</a></li>
+					<li><a href="#">Farmers Vs Monsanto</a></li>
+					<li><a href="#">Donate</a></li>
+				</ul>
+			</aside>
 
-					<section class="top-bar-section">
-						<ul class="left">
-							<li><a href="#">Campaigns</a></li>
-							<li><a href="#">Blog</a></li>
-							<li><a href="#">Press</a></li>
-							<li><a href="#">About</a></li>
-							<li><a href="#">Shirts</a></li>
-							<li><a href="#">Farmers Vs Monsanto</a></li>
-							<li><a href="#">Donate</a></li>
-						</ul> <!-- .left -->
+			<div class="container">
+				<div class="header-wrapper row">
+					<div id="header" class="large-12 columns">
+						<h1 class="hidden">Food Democracy Now!</h1>
+						<img src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/header.png" alt="Logo" title="Food Democracy Now!" class="hide-for-small">
+						<img src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/mobile-head.png" alt="Logo" title="Food Democracy Now!" class="show-for-small">  
+					</div> <!-- #header -->
 
-						<div class="socmed">
-							<a href="#" class="fb"><i class="fa fa-facebook"></i></a></li>
-							<a href="#" class="tw"><i class="fa fa-twitter"></i></a></li>
-						</div> <!-- .socmed -->
-					</section> <!-- .top-bar-section -->
-				</nav> <!-- .top-bar -->
-			</div> <!-- #navigation -->
-		</div> <!-- .header-wrapper -->
+					<div id="navigation" class="large-12 columns" aria-hidden="true">
+						<nav class="top-bar" role="navigation">
+							<ul class="title-area">
+								<li class="name show-for-small">{% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}</li>
+								<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+							</ul> <!-- .title-area -->
 
-		<div class="body-wrapper row">
-			<div id="body" class="large-12 columns">
-				{% block content %}{% endblock %}
-			</div> <!-- #body -->
-		</div> <!-- .body-wrapper -->
+							<section class="top-bar-section">
+								<ul class="left">
+									<li><a href="#">Campaigns</a></li>
+									<li><a href="#">Blog</a></li>
+									<li><a href="#">Press</a></li>
+									<li><a href="#">About</a></li>
+									<li><a href="#">Shirts</a></li>
+									<li><a href="#">Farmers Vs Monsanto</a></li>
+									<li><a href="#">Donate</a></li>
+								</ul> <!-- .left -->
 
-		{% block below_form %}
-			<script type="text/javascript">
-				actionkit.forms.contextRoot = '/context/';
-				actionkit.forms.initForm('act');
-			</script>
-		{% endblock %}
+								<div class="socmed">
+									<a href="#" class="fb"><i class="fa fa-facebook"></i></a></li>
+									<a href="#" class="tw"><i class="fa fa-twitter"></i></a></li>
+								</div> <!-- .socmed -->
+							</section> <!-- .top-bar-section -->
+						</nav> <!-- .top-bar -->
+					</div> <!-- #navigation -->
+				</div> <!-- .header-wrapper -->
 
-		<div class="footer-wrapper row">
-			<div class="large-6 columns footer-left">
-				<a href="//example.com/privacy/">{{ 'Privacy'|ak_text:'privacy' }}</a> | <a href="//example.com/contact/">{{ 'Contact'|ak_text:'contact' }}</a>
-			</div> <!-- .footer-left -->
+				<div class="body-wrapper row">
+					<div id="body" class="large-12 columns">
+						{% block content %}{% endblock %}
+					</div> <!-- #body -->
+				</div> <!-- .body-wrapper -->
 
-			<div class="large-6 columns footer-right">
-				(c) 2014 <a href="http://www.fooddemocracynow.org/">Food Democracy Now!</a> All rights reserved</a> | Created By <a href="http://www.richiroutreach.com/">Richir Outreach</a>
-			</div> <!-- .footer-right -->
-		</div> <!-- .footer-wrapper --> 
-	</div> <!-- .container -->
+				{% block below_form %}
+					<script type="text/javascript">
+						actionkit.forms.contextRoot = '/context/';
+						actionkit.forms.initForm('act');
+					</script>
+				{% endblock %}
+
+				<div class="footer-wrapper row">
+					<div class="large-6 columns footer-left">
+						<a href="//example.com/privacy/">{{ 'Privacy'|ak_text:'privacy' }}</a> | <a href="//example.com/contact/">{{ 'Contact'|ak_text:'contact' }}</a>
+					</div> <!-- .footer-left -->
+
+					<div class="large-6 columns footer-right">
+						(c) 2014 <a href="http://www.fooddemocracynow.org/">Food Democracy Now!</a> All rights reserved</a> <span class="hide-for-small">|</span> <span class="small-credit">Created By <a href="http://www.richiroutreach.com/">Richir Outreach</a></span>
+					</div> <!-- .footer-right -->
+				</div> <!-- .footer-wrapper --> 
+			</div> <!-- .container -->
+
+			<a class="exit-off-canvas"></a>
+		</div>
+	</div>
+
 
 	{% if analytics_key %}
 		<script>

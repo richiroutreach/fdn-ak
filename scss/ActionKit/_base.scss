@@ -4,6 +4,10 @@ a {
 
 body {
 	background: url(https://s3.amazonaws.com/Food_Democracy_Now/images/background.gif);
+
+	@media #{$small-only} {
+		background: white;
+	}
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -20,6 +24,11 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 62.5rem;
 	margin: 0 auto 2rem;
 	border-radius: 0 0 10px 10px;
+
+	@media #{$small-only} {
+		margin-bottom: 0;
+		box-shadow: none;
+	}
 }
 
 .hidden {

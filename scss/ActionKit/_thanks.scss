@@ -44,6 +44,10 @@
 		&.fa-twitter-square {
 			color: $twitter-blue;
 		}
+
+		@media #{$small-only} {
+			width: 55px;
+		}
 	}
 
 	.share-button {

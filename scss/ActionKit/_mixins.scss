@@ -11,4 +11,10 @@
 		background: darken($color, 10);
 		border-color: darken($color, 20);
 	}
+
+	@media #{$small-only} {
+		width: 100%;
+		margin: 0;
+		margin-bottom: 2rem;
+	}
 }

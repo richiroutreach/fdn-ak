@@ -1,3 +1,37 @@
 #header {
 	padding: 0;
+	background: url(https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/mobile-head-background.png) repeat-x;
+	background-size:contain;
+	background-position:center;
+
+	img.show-for-small {
+		padding-left: 3rem;
+		float: right;
+	}
+}
+
+@media screen and (max-width: 895px) and (min-width: 641px) {
+	#header {
+		background: url(https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/tablet-head-background.png) repeat-x;
+		background-size:contain;
+		background-position:center;
+
+		img {
+			padding-left: 1.5rem;
+		}
+	}
+}
+
+@media #{$small-only} {
+	.header-wrapper {
+		width: 100%;
+		padding-bottom: 5px;
+		background-color: $grass-right;
+		background-image: -ms-linear-gradient(left, $grass-left 0%, $grass-right 100%);
+		background-image: -moz-linear-gradient(left, $grass-left 0%, $grass-right 100%);
+		background-image: -o-linear-gradient(left, $grass-left 0%, $grass-right 100%);
+		background-image: -webkit-gradient(linear, left top, right top, color-stop(0, $grass-left), color-stop(1, $grass-right));
+		background-image: -webkit-linear-gradient(left, $grass-left 0%, $grass-right 100%);
+		background-image: linear-gradient(to right, $grass-left 0%, $grass-right 100%);
+	}
 }

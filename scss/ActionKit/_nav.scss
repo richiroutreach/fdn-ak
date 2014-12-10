@@ -1,5 +1,10 @@
 #navigation {
 	padding: 0;
+	display: none;
+
+	@media screen and (min-width: 896px) {
+		display: block;
+	}
 
 	.top-bar {
 		border-bottom: 1px solid black;
@@ -21,6 +26,12 @@
 					}
 				}
 			}
+		}
+
+		.name {
+			color: white;
+			line-height: 45px;
+			padding-left: 1rem;		
 		}
 	}
 
@@ -61,3 +72,47 @@
 		}
 	}
 }
+
+.mobile-nav-toggle {
+	position: absolute;
+	top: 7px;
+	left: 7px;
+	z-index: 99;
+
+	@media screen and (min-width: 895px) {
+		display: none;
+	}
+
+	.menu-icon {
+		text-indent: 2.1875rem;
+		width: 34px;
+		height: 34px;
+		display: block;
+		padding: 0;
+		color: #ffffff;
+		position: relative;
+		transform: translate3d(0, 0, 0);
+		background: $green;
+		border: 1px solid white;
+		border-radius: 5px;
+
+		span::after {
+			content: "";
+			position: absolute;
+			display: block;
+			height: 0;
+			top: 50%;
+			margin-top: -0.5rem;
+			left: 8px;
+			box-shadow: 0 0px 0 1px #ffffff,0 7px 0 1px #ffffff,0 14px 0 1px #ffffff;
+			width: 1rem;
+		}
+	}
+}
+
+/*
+#043A04
+#81D311
+
+5px
+*/
