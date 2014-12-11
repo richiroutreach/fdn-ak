@@ -1,3 +1,9 @@
+/*
+	--------------------------------------------------------------------------
+		Mixins
+	--------------------------------------------------------------------------
+*/
+
 @mixin nice-button($color) {
 	background: $color;
 	display: inline-block;
@@ -16,5 +22,21 @@
 		width: 100%;
 		margin: 0;
 		margin-bottom: 2rem;
+	}
+}
+
+@mixin border-button($color) {
+	display: block;
+	padding: 0.25rem;
+	text-align: center;
+	background: $color;
+	box-shadow: 1px 1px 5px #aaa;
+	color: white;
+	text-transform: uppercase;
+	border: 1px solid white;
+	border-radius: 5px;
+
+	&:hover {
+		background-color: darken($color, 10);
 	}
 }

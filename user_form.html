@@ -1,50 +1,141 @@
-{% load actionkit_tags smartif switchcase %}{% filter remove_blank_lines %}
+{% load actionkit_tags smartif switchcase %}
+<!-- @START Foundation Template/user_form.html -->
+	{% filter remove_blank_lines %}
 
-{% comment %}
+	{% comment %}
+		/*
+			---------------------------------------------------------------------
+				Start Instructions
+			---------------------------------------------------------------------
+		*/
+			To change which fields show, edit {% hide_by_default %} below and set
+			individual pages' required fields in the page admin, or activate the 
+			User Fields customization option in the page admin to override which
+			fields are visible and the order they're shown in.
 
-  To change which fields show, edit {% hide_by_default %} below and set
-  individual pages' required and visible fields in the page admin.
-  
-  Unhide or require the 'country' field to make the form international. To
-  geolocate more users outside the United States, unhide/require 'city'.
-  
-  You can change label text in the language admin, change {% field_order %}
-  below, edit the CSS, or replace this form entirely with static HTML. See
-  the advanced template ref for more:
-  
-  https://roboticdogs.actionkit.com/docs/manual/guide/advanced_templates.html
+			Unhide or require the 'country' field to make the form international. To
+			geolocate more users outside the United States, unhide/require 'city'.
 
-  name email prefix first_name middle_name last_name suffix country address1 address2 city state zip region postal phone
-  
-  Enjoy!
+			You can change label text in the language admin, change {% field_order %}
+			below, edit the CSS, or replace this form entirely with static HTML. See
+			the advanced template ref for more:
 
-{% endcomment %}
+			https://roboticdogs.actionkit.com/docs/manual/guide/advanced_templates.html
 
-{% field_order name email prefix first_name middle_name last_name suffix country address1 address2 city state zip region postal phone %}
-{% hide_by_default prefix first_name middle_name last_name suffix country phone address1 address2 city state region postal %}
+			name email prefix first_name middle_name last_name suffix country address1 address2 city state zip region postal phone
 
-{% for field in fields %}
-  <div class="{% if field|is_in:context.required %}required{% endif %}" id="id_{{ field }}_box">
-    <label for="id_{{ field }}">{{ field|ak_field_label:field|capfirst }}{% if field|is_in:context.required %}<span class="ak-required-flag">*</span>{% endif %}</label>
-  {% switch field %}
-  {% case 'country' %}
-    {% include "./country_select.html" %}
-  {% case 'state' %}
-    {% include "./state_select.html" %}
-  {% else %}
-    <input name="{{ field }}" id="id_{{ field }}" type="text">
-  {% endswitch %}
-  </div>
-{% endfor %}
+			Enjoy!
+		/*
+			---------------------------------------------------------------------
+				End Instructions
+			---------------------------------------------------------------------
+		*/
+	{% endcomment %}
 
-{% if 'country'|is_in:fields %}
-  <input type="hidden" name="auto_country" value="1">
-  <style type="text/css">
-    /* Ensure that, if there's no JavaScript, the global-friendly fields show
-     * rather than the US-only ones */
-    #id_zip_box, #id_state_box { display: none; }
-  </style>
-{% else %}
-  <input type="hidden" name="country" value="United States">
-{% endif %}
+	{% field_order name email prefix first_name middle_name last_name suffix country address1 address2 city state zip region postal phone %}
+	{% hide_by_default prefix first_name middle_name last_name suffix country phone address1 address2 city state region postal %}
+
+	<script>
+		$(document).ready(function() {
+			$('#act').validate({
+				rules: {
+					{% for field in user_fields %}
+						{% if field.field_name|is_in:context.required %}
+							{{ field.field_name }}: {
+								required: true
+								{% switch field.field_name %}
+									{% case 'email' %}
+										, email: true
+									{% case 'zip' %}
+										, zipcodeUS: true
+									{% else %}
+								{% endswitch %}
+							}{% if not forloop.last %},{% endif %}
+						{% endif %}
+					{% endfor %}
+				},
+
+				messages: {
+					email: {
+						required: 'Enter a valid email address.',
+						email: 'Enter a valid email address.',
+						akemail: 'Enter a valid email address.'
+					},
+
+					name: {
+						required: 'Enter your name.'
+					},
+
+					address1: {
+						required: 'Enter your address.'
+					},
+
+					city: {
+						required: 'Enter your city.'
+					},                 
+
+					state: {
+						required: 'Select your state.'
+					},
+
+					zip: {
+						required: 'Enter a valid ZIP code.',
+						zipcodeUS: 'Enter a valid zip code.'
+					},
+
+					postal: {
+						required: 'Enter your postal code.'
+					},					
+				},
+
+				errorElement: 'li',
+				errorClass: 'form-error',
+				errorLabelContainer: "#ak-errors",
+
+				highlight: function(element, errorClass, validClass) {
+					var label = $("label[for='"+$(element).attr('id')+"']");
+
+					$(label).addClass("has-error");
+				},
+
+				unhighlight: function(element, errorClass, validClass) {
+					var label = $("label[for='"+$(element).attr('id')+"']");
+
+					$(label).removeClass("has-error");
+				}				
+			});
+		});
+	</script>
+
+	{% for field in user_fields %}
+		<div id="id_{{ field.field_name }}_box" class="{% if field.field_name|is_in:context.required %}required{% endif %} field">
+			<label for="id_{{ field.field_name }}">
+				{{ field.label_text }}{% if field.field_name|is_in:context.required %}<span class="ak-required-flag">*</span>{% endif %}
+			</label>
+			
+			{% switch field.field_name %}
+				{% case 'country' %}
+					{% include "./country_select.html" %}
+				{% case 'state' %} 
+					{% include "./state_select.html" %}
+				{% else %}
+					{{ field.input_tag }}
+			{% endswitch %}
+		</div>
+	{% endfor %}
+
+	{% if 'country'|is_in:fields %}
+		<input type="hidden" name="auto_country" value="1">
+	
+		<style type="text/css">
+			/* 
+				Ensure that, if there's no JavaScript, the global-friendly fields show
+				rather than the US-only ones 
+			*/
+			#id_zip_box, #id_state_box { display: none; }
+		</style>
+	{% else %}
+		<input type="hidden" name="country" value="United States">
+	{% endif %}
 {% endfilter %}
+<!-- @START Foundation Template/user_form.html -->

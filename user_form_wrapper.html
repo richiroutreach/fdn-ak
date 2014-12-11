@@ -1,8 +1,19 @@
+<!-- @START Foundation Template/user_form_wrapper.html -->
+<script>
+	$(document).ready(function() {
+		$('.user-form input').each(function() {
+			overlayLabels($(this));
+		});
+	});
+</script>
+
 <ul class="compact" id="ak-errors"></ul>
+
 <div id="known_user">
-Not <span id="known_user_name"></span>?  <a href="?" onclick="return actionkit.forms.logOut()">Click here.</a>
-<hr />
+	Not <span id="known_user_name"></span>?  <a href="?" onclick="return actionkit.forms.logOut()">Click here.</a>
 </div>
-<div id="unknown_user" class="user-form ak-labels-overlaid ak-errs-below">
-{% include "./user_form.html" %}
+
+<div id="unknown_user" class="user-form">
+	{% include "./user_form.html" %}
 </div>
+<!-- @END Foundation Template/user_form_wrapper.html -->

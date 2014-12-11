@@ -1,3 +1,9 @@
+/*
+	--------------------------------------------------------------------------
+		Thank You Page SASS (thanks.html)
+	--------------------------------------------------------------------------
+*/
+
 .thank-you-text {
 	margin-top: 2rem;
 }
@@ -51,19 +57,7 @@
 	}
 
 	.share-button {
-		display: block;
-		padding: 0.25rem;
-		text-align: center;
-		background: $green;
-		box-shadow: 1px 1px 5px #aaa;
-		color: white;
-		text-transform: uppercase;
-		border: 1px solid white;
-		border-radius: 5px;
-
-		&:hover {
-			background-color: darken($green, 10);
-		}
+		@include border-button($green);
 	}
 }
 

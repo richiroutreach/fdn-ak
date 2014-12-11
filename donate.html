@@ -212,28 +212,12 @@
 	*/
 {% endcomment %}
 
+{% comment %}
 <script language="javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
 <script language="javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/additional-methods.min.js"></script>
+{% endcomment %}
 
 <script>
-	/*
-		Get a value for a given URL parameter
-	*/
-	function getURLParameter(name) {
-	     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
-	}
-
-
-	/*
-		Scroll the viewport to a given anchor
-		see: http://stackoverflow.com/questions/8579643/simple-jquery-scroll-to-anchor-up-or-down-the-page
-	*/
-	function scrollToAnchor(aid){
-		var aTag = $("a[name='"+ aid +"']");
-		$('html,body').animate({scrollTop: aTag.offset().top},'slow');
-	}
-
-
 	/*
 		Make the donation page panels all the same height
 	*/
@@ -361,42 +345,16 @@
 			fixHeight();
 		});
 
+
 		/*
 			---------------------------------------------------------------
 				Javascript to overlay the form labels
 			---------------------------------------------------------------
 		*/
-		function checkContent(field) {
-			var label = $("label[for='"+$(this).attr('id')+"']");
 
-			var is_select = $(this).prop("selectedIndex");
-
-			if( $(this).val() || is_select) {
-				label.addClass("has-content");
-			} else {
-				label.removeClass("has-content");
-			}
-		}
-
-		$('.splash-layout input[type="text"], .splash-layout select').focus(function() {
-			var label = $("label[for='"+$(this).attr('id')+"']");
-
-			label.addClass("focus");
-		}).blur(function() {
-			var label = $("label[for='"+$(this).attr('id')+"']");
-
-			label.removeClass("focus");
-		}).bind('keydown', function() {
-			var label = $("label[for='"+$(this).attr('id')+"']");
-
-			label.addClass("has-content");
-		}).bind('dragenter', function() {
-			label.addClass("has-content");
-		}).bind('dragleave', function() {
-				setTimeout(function() {
-					checkContent(this);
-				},1);
-		}).bind('change', checkContent).bind('keyup', checkContent);
+		$('.splash-layout input[type="text"], .splash-layout select').each(function() {
+			overlayLabels($(this));
+		});
 
 
 		/*
@@ -744,7 +702,7 @@
 						<strong><h3>Billing Information</h3></strong>
 					</div>
 
-					<div class="user-form">
+					<div class="user-form overlay-form">
 						<div class="medium-6 columns">
 							<label for="name">Name</label>
 							<input id="name" type="text" name="name" />
@@ -829,7 +787,7 @@
 				{% endcomment %}
 			</div> <!-- .page-3 -->
 
-			<div id="step-4" class="donation-page payment-form page-4">
+			<div id="step-4" class="donation-page payment-form overlay-form page-4">
 				{% comment %}
 					/*
 						---------------------------------------------------------------------
@@ -907,7 +865,7 @@
 								/
 							</div>
 
-							<div class="large-2 medium-4 small-6 columns">
+							<div class="large-3 medium-4 small-6 columns">
 								<label for="exp_date_year">YYYY</label>
 								<select id="exp_date_year" type="text" name="exp_date_year">
 									<option value=""></option>

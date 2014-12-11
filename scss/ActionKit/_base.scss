@@ -1,3 +1,10 @@
+/*
+	--------------------------------------------------------------------------
+		Base SASS
+	--------------------------------------------------------------------------
+*/
+
+
 a {
 	transition: 300ms ease-out;
 }
@@ -12,6 +19,12 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
 	font-family: helvetica,arial,sans-serif;
+}
+
+h2.page-title {
+	color: $red;
+	font-size: 1.75rem;
+	font-weight: bold;
 }
 
 [class*="column"] + [class*="column"]:last-child {

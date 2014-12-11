@@ -1,47 +1,89 @@
 {% extends "./wrapper.html" %}{% load actionkit_tags %}
-
+<!-- @START Foundation Template/petition.html -->
 {% block content %}
 
-<form class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
-<input type="hidden" name="page" value="{{ page.name }}">
+<form id="act" class="ak-form" name="act" method="POST" action="/act/" accept-charset="utf-8">
+	<input type="hidden" name="page" value="{{ page.name }}">
 
-<h2>{{ page.title }}</h2>
+	<a name="form-top"></a>
 
-<div class="col end" id="petition-box">
-    {% autoescape off %}
+	<div class="row hide-for-small desktop-about">
+		{% if page.custom_fields.image_url %}
+			<div class="medium-3 columns image-column">
+				<img class="image_url" src="{{page.custom_fields.image_url}}">
+			</div> <!-- .image-column -->
+		{% endif %}
 
-    <div class="ak-abovefold box">{% if form.statement_leadin %}{% include_tmpl form.statement_leadin %} {% endif %}<b>&ldquo;</b>{% include_tmpl form.statement_text %}<b>&rdquo;</b></div>
-    
-    {% endautoescape %}
+		<div class="{% if page.custom_fields.image_url %}medium-9 {% else %}medium-12 {% endif %}columns petition-content">
+			<h2 class="page-title">{{ page.title }}</h2>
+	
+			{% autoescape off %}
+				{% include_tmpl form.about_text %}
+			{% endautoescape %}
+		</div> <!-- .petition-content -->
+	</div> <!-- .desktop-about -->
 
-    <a class="ak-continued" href="#more">Read more...</a>
-</div>
+	<div class="row">
+		<div class="medium-4 medium-offset-1 columns petition-box-wrapper">
+			<div class="petition-box">
+				<h3>Add your voice</h3>
 
-<div id="petition-form" class="border ak-labels-overlaid col">
+				<div class="petition-form overlay-form">
+					{% include "./user_form_wrapper.html" %}
+				</div>
 
-    {% include "./user_form_wrapper.html" %}
+				<input type="submit" class="button" value="Sign Petition">
+			</div> <!-- .petition-box -->
+		</div> <!-- .petition-box-wrapper -->
 
-    <div class="ak-field"><label class="wide" for="id_comment">Comment</label> <textarea id="id_comment" name="action_comment"></textarea></div>
+		<div class="medium-6 columns petition-ask-wrapper">
+			<div class="petition-ask">
+				{% if page.custom_fields.topper_image %}
+					<img class="topper hide-for-small" src="{{page.custom_fields.topper_image}}">
+				{% else %}
+					<img class="topper hide-for-small" src="https://s3.amazonaws.com/fooddemocracynow/images/petition_chicken.png">
+				{% endif %}
 
-    {% include "./inline_tellafriend.html" %}
+				{% if form.statement_leadin %}
+					<div class="petition-leadin">
+						{% autoescape off %}
+							{% include_tmpl form.statement_leadin %}
+						{% endautoescape %}
+					</div> <!-- .petition-leadin -->
+				{% endif %}
+		
+				{% autoescape off %}
+					{% include_tmpl form.statement_text %}
+				{% endautoescape %}
+			</div> <!-- .petition-ask -->
+		</div> <!-- .petition-ask-wrapper -->
+	</div> <!-- .row -->
 
-    <button type="submit" class="ak-styled-submit-button">Sign Petition</button>
+	<div class="row show-for-small mobile-about">
+		<div class="small-12 columns top-button">
+			<input type="button" class="button small" value="Back to Top" onclick="scrollToAnchor('form-top');">
+		</div> <!-- .top-button -->
 
-</div>
+		<div class="small-12 columns">
 
+			<h2 class="page-title">{{ page.title }}</h2>
+	
+			{% autoescape off %}
+				{% include_tmpl form.about_text %}
+			{% endautoescape %}
+		</div>
 
-<div id="petition-story" class="col end">
-    <a name="more"></a>
-    {% autoescape off %}
+		{% if page.custom_fields.image_url %}
+			<div class="small-12 columns image-column">
+				<img class="image_url" src="{{page.custom_fields.image_url}}">
+			</div> <!-- .image-column -->
+		{% endif %}
 
-    <div>{% include_tmpl form.about_text %}</div>
-
-    {% endautoescape %}
-
-    {% include "./progress_meter.html" %}
-</div>
-
-
+		<div class="small-12 columns top-button">
+			<input type="button" class="button" value="Back to Top" onclick="scrollToAnchor('form-top');">
+		</div> <!-- .top-button -->
+	</div> <!-- .mobile-about -->
 </form>
 
+<!-- @END Foundation Template/petition.html -->
 {% endblock %}

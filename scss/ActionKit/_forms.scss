@@ -1,0 +1,73 @@
+/*
+	--------------------------------------------------------------------------
+		Forms
+	--------------------------------------------------------------------------
+*/
+
+.overlay-form {
+	label {
+		position: absolute;
+		padding: 0.5rem 1rem;
+		color: $label-color;
+		left: 0px;
+		z-index: 1;
+		font-size: 1rem;
+		pointer-events: none;
+
+		&.focus {
+			color: rgba($label-color, 0.5);
+		}
+
+		&.has-content {
+			display: none;
+
+			& + select {
+				color: black;
+			}
+		}
+
+		&.has-error {
+			color: $errorColor;
+
+			& + select, & + input[type="text"] {
+				color: $errorColor;
+			}
+		}
+	}
+
+	input {
+		font-size: 1rem;
+	}
+
+	select {
+		margin: 0;
+		height: 38px;
+		color: $label-color;
+		font-size: 1rem;
+		padding-top: 8px;
+	}
+
+	.field {
+		position: relative;
+	}
+}
+
+#ak-errors {
+	display: none;
+	color: $errorColor;
+	margin: 0;
+
+	&:before {
+		content: "There was a problem with your submission:";
+		display: block;
+		color: black;
+	}
+
+	li {
+		margin-left: 1rem;
+
+		&:last-child {
+			margin-bottom: 1rem;
+		}
+	}
+}

@@ -1,9 +1,21 @@
 /*
 	Base Custom Styles for Food Democracy Now! Actionkit
 	nicole@richiroutreach.com
-	V0.1
-	09/30/2014
+	V0.5
+	12/11/2014
 */
+
+/*
+	--------------------------------------------------------------------------
+		Google Fonts
+	--------------------------------------------------------------------------
+*/
+
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700,900);
+@import url(https://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here);
+
+$lato: 'Lato', sans-serif;
+$justMe: 'Just Me Again Down Here', cursive;
 
 
 /*
@@ -13,18 +25,19 @@
 */
 
 @import "settings";
-@import "foundation";
-
+@import "foundation/components/visibility";
 
 /*
 	--------------------------------------------------------------------------
 		Color Variables
 	--------------------------------------------------------------------------
 */
+
 $gold: #FFD302;
 $green: #78B620;
 $red: #C90000;
 $blue: #1b6cb4;
+$petitionBG: #E0F0FC;
 
 $twitter-blue: #4099FF;
 $facebook-blue: #3b5998;
@@ -41,25 +54,19 @@ $grass-left: #043A04;
 $grass-right: #81D311;
 
 
-
-/*
-	--------------------------------------------------------------------------
-		Google Fonts
-	--------------------------------------------------------------------------
-*/
-@import url(http://fonts.googleapis.com/css?family=Lato:400,700,900);
-
-$lato: 'Lato', sans-serif;
-
 /*
 	--------------------------------------------------------------------------
 		Component SCSS
 	--------------------------------------------------------------------------
 */
+
 @import "actionkit/mixins";
 @import "actionkit/base";
 @import "actionkit/header";
 @import "actionkit/nav";
+@import "actionkit/forms";
+@import "actionkit/user_form";
+@import "actionkit/petition";
 @import "actionkit/donate";
 @import "actionkit/footer";
 @import "actionkit/thanks";

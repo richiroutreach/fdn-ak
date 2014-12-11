@@ -1,3 +1,9 @@
+/*
+	--------------------------------------------------------------------------
+		Donate Page SASS (donate.html)
+	--------------------------------------------------------------------------
+*/
+
 form .row.background {
 	&.tree {
 		background: url(https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/images/tree-background.jpg) no-repeat center center;
@@ -25,16 +31,6 @@ form .row.background {
 	h3 {
 		color: $red;
 		font-size: 1.5rem;
-	}
-
-	label {
-		color: white;
-		font-size: 1rem;
-	}
-
-	select {
-		margin: 0;
-		margin-top: 24px;
 	}
 
 	input[type="radio"] {
@@ -164,48 +160,6 @@ form .row.background {
 	}
 
 	.user-form, .payment-form {
-		label {
-			position: absolute;
-			padding: 0.5rem 1rem;
-			color: $label-color;
-			left: 0px;
-			z-index: 1;
-			font-size: 1rem;
-			pointer-events: none;
-
-			&.focus {
-				color: rgba($label-color, 0.5);
-			}
-
-			&.has-content {
-				display: none;
-
-				& + select {
-					color: black;
-				}
-			}
-
-			&.has-error {
-				color: $errorColor;
-
-				& + select {
-					color: $errorColor;
-				}
-			}
-		}
-
-		input {
-			font-size: 1rem;
-		}
-
-		select {
-			margin: 0;
-			height: 38px;
-			color: $label-color;
-			font-size: 1rem;
-			padding-top: 8px;
-		}
-
 		.divider {
 			font-size: 1.75rem;
 			text-align: center;
@@ -218,17 +172,16 @@ form .row.background {
 		text-align: center;
 
 		#ak-errors {
-			margin: 0;
 			margin-top: -($column-gutter);
 			margin-left: -($column-gutter);
 
 			&:before {
-				content: "There was a problem with your submission:";
-				display: block;
 				color: white;
 			}
 
 			li {
+				color: lighten($red, 20);
+				margin: 0;
 				margin-left: 1rem;
 			}
 		}
@@ -239,7 +192,6 @@ form .row.background {
 			position: absolute;
 			padding: $column-gutter / 2;
 			background: rgba(#000, 0.95);
-			color: lighten($red, 20);
 			width: rem-calc(250) + ($column-gutter);
 		}
 	}
