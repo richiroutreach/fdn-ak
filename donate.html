@@ -348,17 +348,6 @@
 
 		/*
 			---------------------------------------------------------------
-				Javascript to overlay the form labels
-			---------------------------------------------------------------
-		*/
-
-		$('.splash-layout input[type="text"], .splash-layout select').each(function() {
-			overlayLabels($(this));
-		});
-
-
-		/*
-			---------------------------------------------------------------
 				Populate form off URL Parameters
 			---------------------------------------------------------------
 		*/
@@ -408,13 +397,6 @@
 				Validation
 			---------------------------------------------------------------
 		*/
-
-		// Custom validation function because the default email validator
-		// isn't as strict as the default AK one. See actionkit.js for source.
-		jQuery.validator.addMethod('akemail', function(value, element) {
-			var regex = !/^\s*\S+@\S+\.\S+\s*$/;
-			return this.optional(element) || /^\s*\S+@\S+\.\S+\s*$/.test(value);
-		}, "Invalid email address.");
 
 		$('#act').validate({
 			rules: {
@@ -553,7 +535,7 @@
 
 				$(label).removeClass("has-error");
 			}
-		});			
+		});
 	});
 </script>
 

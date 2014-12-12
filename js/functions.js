@@ -15,6 +15,12 @@ function scrollToAnchor(aid){
 	$('html,body').animate({scrollTop: aTag.offset().top},'slow');
 }
 
+// Custom validation function because the default email validator
+// isn't as strict as the default AK one. See actionkit.js for source.
+jQuery.validator.addMethod('akemail', function(value, element) {
+	var regex = !/^\s*\S+@\S+\.\S+\s*$/;
+	return this.optional(element) || /^\s*\S+@\S+\.\S+\s*$/.test(value);
+}, "Invalid email address.");
 
 /*
 	---------------------------------------------------------------
@@ -23,11 +29,11 @@ function scrollToAnchor(aid){
 */
 
 function checkContent(field) {
-	var label = $("label[for='"+$(this).attr('id')+"']");
+	var label = $("label[for='" + $(field).attr('id') + "']");
 
-	var is_select = $(this).prop("selectedIndex");
+	var is_select = $(field).prop("selectedIndex");
 
-	if( $(this).val() || is_select) {
+	if( $(field).val() || is_select) {
 		label.addClass("has-content");
 	} else {
 		label.removeClass("has-content");
@@ -35,23 +41,53 @@ function checkContent(field) {
 }
 
 function overlayLabels(field) {
-	$(field).focus(function() {
-		var label = $("label[for='"+$(field).attr('id')+"']");
+	var label = $("label[for='"+$(field).attr('id')+"']");
 
-		label.addClass("focus");
+	$(field).not(
+		'.has-overlay'
+	).focus(function() {
+		label.addClass('focus');
+
+		checkContent(field);
 	}).blur(function() {
-		var label = $("label[for='"+$(field).attr('id')+"']");
+		label.removeClass('focus');
 
-		label.removeClass("focus");
+		checkContent(field);
 	}).bind('keydown', function() {
-		var label = $("label[for='"+$(field).attr('id')+"']");
-
-		label.addClass("has-content");
+		label.addClass('has-content');
 	}).bind('dragenter', function() {
-		label.addClass("has-content");
+		label.addClass('has-content');
 	}).bind('dragleave', function() {
 		setTimeout(function() {
-			checkContent(this);
-		},1);
-	}).bind('change', checkContent).bind('keyup', checkContent);
+			checkContent(field);
+		}, 1)
+	}).bind( 'change',
+		checkContent(field)
+	).bind( 'keyup', 
+		checkContent(field)
+	).on( 'input', function() {
+		checkContent(field);
+	}).addClass(
+		'has-overlay'
+	);
+
+	// Hides labels when browser prefills due to "back" button
+	checkContent(field);
 }
+
+
+/*
+	---------------------------------------------------------------
+		On-load Functions
+	---------------------------------------------------------------
+*/
+
+$(document).ready(function() {
+	// Overlay labels on forms where needed
+	$('.overlay-form input[type="text"], .overlay-form select').each( function() { overlayLabels( $(this) ); });
+
+	// Check our labels on load (solves browser autofill issues)
+	window.setTimeout(function() {
+		$('.overlay-form input[type="text"], .overlay-form select').each( function() { checkContent( $( this ) ); });
+	}, 10);
+});
