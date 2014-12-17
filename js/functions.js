@@ -90,4 +90,11 @@ $(document).ready(function() {
 	window.setTimeout(function() {
 		$('.overlay-form input[type="text"], .overlay-form select').each( function() { checkContent( $( this ) ); });
 	}, 10);
+
+	// Ensure the form is valid before we submit it - this ensures AK validation won't trigger until we think it's valid
+	$('#submit-button').click(function() {
+		if( $('#act').valid() ) {
+			$('#act').submit();
+		}
+	});
 });

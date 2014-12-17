@@ -45,7 +45,7 @@
 								required: true
 								{% switch field.field_name %}
 									{% case 'email' %}
-										, email: true
+										, email: true, akemail: true
 									{% case 'zip' %}
 										, zipcodeUS: true
 									{% else %}
@@ -79,8 +79,8 @@
 					},
 
 					zip: {
-						required: 'Enter a valid ZIP code.',
-						zipcodeUS: 'Enter a valid zip code.'
+						required: 'Enter a valid zip code.',
+						zipcodeUS: 'Enter a valid US zip code.'
 					},
 
 					postal: {
@@ -102,7 +102,14 @@
 					var label = $("label[for='"+$(element).attr('id')+"']");
 
 					$(label).removeClass("has-error");
-				}				
+				}
+			});
+
+			$('#act').submit(function() {
+				if( !$(this).valid() ) {
+					console.log("yo");
+					return false;
+				}
 			});
 		});
 	</script>

@@ -5,7 +5,7 @@
 */
 
 .petition-page {
-	input[type="submit"] {
+	input[type="submit"], input#submit-button {
 		@include border-button($green);
 	}
 

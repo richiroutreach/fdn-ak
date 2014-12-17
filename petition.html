@@ -10,7 +10,7 @@
 	<div class="row hide-for-small desktop-about">
 		{% if page.custom_fields.image_url %}
 			<div class="medium-3 columns image-column">
-				<img class="image_url" src="{{page.custom_fields.image_url}}">
+				<img class="image_url" src="{{page.custom_fields.image_url}}" alt="Petition Image">
 			</div> <!-- .image-column -->
 		{% endif %}
 
@@ -28,20 +28,23 @@
 			<div class="petition-box">
 				<h3>Add your voice</h3>
 
-				<div class="petition-form overlay-form">
+				<div class="petition-form overlay-form ak-err-above">
 					{% include "./user_form_wrapper.html" %}
 				</div>
 
-				<input type="submit" class="button" value="Sign Petition">
+				<div class="form-submit">
+					<input id="submit-button" type="button" class="button" value="Sign Petition">
+					<input type="submit" class="button" value="Sign Petition">
+				</div> <!-- .form-submit -->
 			</div> <!-- .petition-box -->
 		</div> <!-- .petition-box-wrapper -->
 
 		<div class="medium-6 columns petition-ask-wrapper">
 			<div class="petition-ask">
 				{% if page.custom_fields.topper_image %}
-					<img class="topper hide-for-small" src="{{page.custom_fields.topper_image}}">
+					<img class="topper hide-for-small" src="{{page.custom_fields.topper_image}}" alt="Petition Header Image">
 				{% else %}
-					<img class="topper hide-for-small" src="https://s3.amazonaws.com/fooddemocracynow/images/petition_chicken.png">
+					<img class="topper hide-for-small" src="https://s3.amazonaws.com/fooddemocracynow/images/petition_chicken.png" alt="Petition Header Image">
 				{% endif %}
 
 				{% if form.statement_leadin %}
@@ -75,7 +78,7 @@
 
 		{% if page.custom_fields.image_url %}
 			<div class="small-12 columns image-column">
-				<img class="image_url" src="{{page.custom_fields.image_url}}" onclick="scrollToAnchor('form-top');">
+				<img class="image_url" src="{{page.custom_fields.image_url}}" onclick="scrollToAnchor('form-top');" alt="Petition Image">
 			</div> <!-- .image-column -->
 		{% endif %}
 

@@ -71,3 +71,20 @@
 		}
 	}
 }
+
+
+.js {
+	.form-submit {
+		input[type="submit"] {
+			display: none;
+		}
+	}
+}
+
+.no-js {
+	.form-submit {
+		input#submit-button {
+			display: none;
+		}
+	}
+}
