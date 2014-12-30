@@ -34,9 +34,9 @@ h2.page-title {
 .container {
 	background: #FFF;
 	box-shadow: 0 0 5px #878787;
-	max-width: 62.5rem;
 	margin: 0 auto 2rem;
 	border-radius: 0 0 10px 10px;
+	max-width: 62.5rem;
 
 	@media #{$small-only} {
 		margin-bottom: 0;

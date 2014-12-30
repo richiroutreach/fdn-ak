@@ -1,0 +1,98 @@
+.splash-wrapper {
+	.one-column {
+		padding-top: 2rem;
+		padding-bottom: 2rem;
+
+		.form-column {
+			background: rgba(white, 0.65);
+			color: black;
+			padding: 1rem;
+			border: none;
+			border-radius: 5px;
+			min-height: 0;
+
+			.amounts {
+				margin-bottom: 2rem;
+			}
+		}
+	}
+
+	.page-buttons {
+		.button {
+			background: $blue;
+
+			&:hover {
+				background: darken($blue, 10);
+			}
+		}
+	}
+
+	.product {
+		.select { 
+			text-align: center;
+			color: $blue;
+			font-size: 1.25rem;
+			font-weight: bold;
+
+			&.checked {
+				color: $red;
+			}
+		}
+
+		.text {
+			h3 {
+				margin: 0 0 0.25rem 0;
+			}
+		}
+
+		.image {
+			vertical-align: middle;
+			
+			img {
+				border: 1px solid black;
+			}
+		}
+	}
+
+	.product-divider {
+		width: 80%;
+		margin: 2rem auto;
+		border: 1px solid #666;
+
+		&:last-child {
+			display: none;
+		}
+	}
+
+	.donate-footer {
+		border: none;
+		color: white;
+	}
+
+	.shipping-same {
+		@include fancy-checkbox(37px);
+
+		label.checkbox {
+			background: transparent;
+			border-radius: 0;
+			border: none;
+			padding: 0;
+
+			span {
+				border: 1px solid #ccc;
+				margin-bottom: 1rem;
+			}
+
+			& >input[type="checkbox"]:checked {
+				& + span:after {
+					top: 6px;
+					font-size: 35px;
+				}
+			}
+		}
+
+		.same-label {
+			line-height: 35px;
+		}
+	}
+}

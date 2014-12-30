@@ -40,3 +40,45 @@
 		background-color: darken($color, 10);
 	}
 }
+
+
+/*
+	Makes Checkboxes Fancy
+	Requires Font Awesome
+ 
+	HTML:
+	<label class="checkbox"><input type="checkbox"><span></span></label>
+*/
+@mixin fancy-checkbox($size) {
+	input[type="checkbox"] {
+		display: none;
+	}
+ 
+	label.checkbox {
+		& > input[type="checkbox"] + span {
+			width: $size;
+			height: $size;
+			margin-right: 0.5rem;
+			background: white;
+			float: left;
+			position: relative;
+		}
+ 
+		& > input[type="checkbox"]:checked + span:after {
+			content: "\f00c";
+			display: block;
+			font-family: FontAwesome;
+			color: black;
+			position: absolute;
+			font-size: $size;
+			top: 1px;	
+		}
+	}
+ 
+	label.checkbox {
+		float: left;
+		margin: 0;
+		line-height: 23px;
+		text-transform: uppercase;
+	}
+}

@@ -23,6 +23,10 @@
 
 	.footer-right {
 		text-align: right;
+
+		span {
+			display: inline;
+		}
 	}
 
 	@media #{$small-only} {

@@ -35,8 +35,9 @@ $justMe: 'Just Me Again Down Here', cursive;
 
 $gold: #FFD302;
 $green: #78B620;
-$red: #C90000;
-$blue: #1b6cb4;
+//$red: #C90000;
+$red: #CD3A3B;
+$blue: #1B6CB4;
 $petitionBG: #E0F0FC;
 
 $twitter-blue: #4099FF;
@@ -70,3 +71,5 @@ $grass-right: #81D311;
 @import "actionkit/donate";
 @import "actionkit/footer";
 @import "actionkit/thanks";
+@import "actionkit/splash";
+@import "actionkit/donate_splash";

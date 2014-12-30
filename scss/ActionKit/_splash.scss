@@ -1,0 +1,39 @@
+/*
+	--------------------------------------------------------------------------
+		Styling specific to the splash layout
+	--------------------------------------------------------------------------
+*/
+
+body {
+	background: transparent;
+}
+
+.container {
+	max-width: 100%;
+	margin: 0;
+	border: none;
+	border-radius: 0;
+}
+
+.splash-header-wrapper {
+	background: url(https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/tablet-head-background.png);
+
+	.header-wrapper {
+		padding-bottom: 0;
+		border: none;
+	}
+}
+
+.grass-border {
+	height: 5px;
+	background-image: -ms-linear-gradient(left, $grass-left 0%, $grass-right 100%);
+	background-image: -moz-linear-gradient(left, $grass-left 0%, $grass-right 100%);
+	background-image: -o-linear-gradient(left, $grass-left 0%, $grass-right 100%);
+	background-image: -webkit-gradient(linear, left top, right top, color-stop(0, $grass-left), color-stop(1, $grass-right));
+	background-image: -webkit-linear-gradient(left, $grass-left 0%, $grass-right 100%);
+	background-image: linear-gradient(to right, $grass-left 0%, $grass-right 100%);
+}
+
+.footer-wrapper {
+	border: none;
+}

@@ -12,6 +12,14 @@ form .row.background {
 		-o-background-size: cover;
 		background-size: cover;
 	}
+
+	&.corn {
+		background: url(https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/images/corn-field-bg.png) no-repeat center center;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;	
+	}
 }
 
 .form-column {
@@ -33,12 +41,12 @@ form .row.background {
 		font-size: 1.5rem;
 	}
 
-	input[type="radio"] {
+	input[type="radio"], input[type="checkbox"] {
 		display: none;
 	}
 
-	label.radio {
-		background: $green;
+	label.radio, label.checkbox {
+		background: $blue;
 		color: white;
 		font-weight: bold;
 		text-align: center;
@@ -47,16 +55,16 @@ form .row.background {
 		font-size: 1.25rem;
 		margin: 0.25rem;
 		transition: 300ms;
-		border: 1px solid darken($green, 10);
+		border: 1px solid darken($blue, 10);
 
 		&:hover {
-			background: darken($green, 10);
-			border-color: darken($green, 20);
+			background: darken($blue, 10);
+			border-color: darken($blue, 20);
 		}
 
 		&.checked {
-			background: $blue;
-			border-color: darken($blue, 20);
+			background: $red;
+			border-color: darken($red, 20);
 		}
 	}
 

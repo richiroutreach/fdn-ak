@@ -1,15 +1,17 @@
 /*
-	Get a value for a given URL parameter
+	---------------------------------------------------------------------------
+		Helper functions
+	---------------------------------------------------------------------------
 */
+
+// Get a value for a given URL parameter
 function getURLParameter(name) {
      return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 }
 
 
-/*
-	Scroll the viewport to a given anchor
-	see: http://stackoverflow.com/questions/8579643/simple-jquery-scroll-to-anchor-up-or-down-the-page
-*/
+// Scroll the viewport to a given anchor
+// see: http://stackoverflow.com/questions/8579643/simple-jquery-scroll-to-anchor-up-or-down-the-page
 function scrollToAnchor(aid){
 	var aTag = $("a[name='"+ aid +"']");
 	$('html,body').animate({scrollTop: aTag.offset().top},'slow');
@@ -22,10 +24,11 @@ jQuery.validator.addMethod('akemail', function(value, element) {
 	return this.optional(element) || /^\s*\S+@\S+\.\S+\s*$/.test(value);
 }, "Invalid email address.");
 
+
 /*
-	---------------------------------------------------------------
+	---------------------------------------------------------------------------
 		Overlay labels on form elements
-	---------------------------------------------------------------
+	---------------------------------------------------------------------------
 */
 
 function checkContent(field) {
@@ -77,9 +80,9 @@ function overlayLabels(field) {
 
 
 /*
-	---------------------------------------------------------------
+	---------------------------------------------------------------------------
 		On-load Functions
-	---------------------------------------------------------------
+	---------------------------------------------------------------------------
 */
 
 $(document).ready(function() {
@@ -98,3 +101,48 @@ $(document).ready(function() {
 		}
 	});
 });
+
+
+/*
+	---------------------------------------------------------------------------
+		Override AK Javascript
+	---------------------------------------------------------------------------
+*/
+(function(ak, utils, forms) {
+
+	/*
+		-----------------------------------------------------------------------
+			Override the Prefil function
+		-----------------------------------------------------------------------
+	*/	
+	forms.prefill = function(overwrite) {
+		var prefill_data = ( 
+			( ak.context && ak.context.prefill_data ) ? ak.context.prefill_data : ak.args
+		);
+
+		$.each(prefill_data, function(field, value) {
+			// Custom handling of amount (radio buttons)
+			if( field == "amount" ) {
+				$('#id_amount_' + value).prop('checked',true);
+
+				$('#id_amount_' + value).parent('label').addClass('checked');
+			
+			// Amount other field needs some magic
+			} else if( field == "amount_other" && value != "" ) {
+				$('#amount_other_field').val(value);
+				$('#amount_other_field').parent('label').addClass('checked');
+
+			// Must be another field!
+			} else {
+				// Is this an input or a select?
+				if( $('input[name="' + field + '"]').length == 0 ) {
+					$('select[name="' + field + '"]').val(value);
+				} else {
+					$('input[name="' + field + '"]').val(value);
+				}
+
+				$('label[for="' + field + '"]').addClass("has-content");
+			}
+		});
+	}
+})(window.actionkit, window.actionkit.utils, window.actionkit.forms);
