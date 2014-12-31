@@ -13,13 +13,49 @@
 
 	<script>startTime=new Date()</script>
 
-	{% if form.id %}
-		<meta name="description" property="og:description" content="{% block description %}{{ page.custom_fields.description|default:form.intro|striptags }}{% endblock %}">
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@START - Facebook Meta Data	
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
+
+	{% if not page.custom_fields.facebook_image_url %}
+		{% if page.custom_fields.image %}
+			<meta property="og:image" content="{{ page.custom_fields.image }}">
+		{% endif %}
+	{% else %}
+		<meta property="og:image" content="{{ page.custom_fields.facebook_image_url }}">
 	{% endif %}
 
-	{% if page.custom_fields.image %}
-		<meta property="og:image" content="{{ page.custom_fields.image }}">
+	{% if page.custom_fields.facebook_title %}
+		<meta property="og:title" content="{{ page.custom_fields.facebook_title }}">
+	{% else %}
+		<meta property="og:title" content="{{ page.title }} | {% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}">
 	{% endif %}
+	
+	{% if page.custom_fields.facebook_url %}
+		<meta property="og:url" content="{{ page.custom_fields.facebook_url }}">
+	{% else %}
+		<meta property="og:url" content="{{ page.canonical_url }}">
+	{% endif %}
+	
+	{% if page.custom_fields.facebook_description %}
+		<meta property="og:description" content="{{ page.custom_fields.facebook_description }}">
+	{% else %}
+		{% if form.id %}
+			<meta name="description" property="og:description" content="{% block description %}{{ page.custom_fields.description|default:form.intro|striptags }}{% endblock %}">
+		{% endif %}
+	{% endif %}
+
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@END - Facebook Meta Data	
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
 
 	{% block meta_additions %}{% endblock %}
 
@@ -53,70 +89,98 @@
 	<script src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/js/functions.js"></script>
 </head>
 
-<body class="{{ filename|split:'.'|nth:0 }}-page lang-{{page.lang.iso_code|default:"unknown"}}{% if page.lang.is_rtl %} ak-rtl{% endif %} ak-no-js {{ page.type }}">
+<body class="{{ filename|split:'.'|nth:0 }}-page lang-{{page.lang.iso_code|default:"unknown"}}{% if page.lang.is_rtl %} ak-rtl{% endif %} ak-no-js {{ page.type }}{% if page.custom_fields.splash_layout %} splash-layout{% endif %}">
 	<!-- Required AK JS -->
 	<script type="text/javascript">actionkit.forms.initPage()</script>
 
 	<div class="off-canvas-wrap" data-offcanvas>
 		<div class="inner-wrap">
-			<nav class="mobile-nav-toggle">
-				<a class="left-off-canvas-toggle menu-icon" href="#"><span></span></a>
-			</nav> <!-- .mobile-nav-toggle -->
 
-			<!-- Off Canvas Menu -->
-			<aside class="left-off-canvas-menu">
-				<!-- whatever you want goes here -->
-				<ul class="off-canvas-list">
-					<li><a href="#">Campaigns</a></li>
-					<li><a href="#">Blog</a></li>
-					<li><a href="#">Press</a></li>
-					<li><a href="#">About</a></li>
-					<li><a href="#">Shirts</a></li>
-					<li><a href="#">Farmers Vs Monsanto</a></li>
-					<li><a href="#">Donate</a></li>
-				</ul>
-			</aside>
+			{% if not page.custom_fields.splash_layout %}
+				<nav class="mobile-nav-toggle">
+					<a class="left-off-canvas-toggle menu-icon" href="#"><span></span></a>
+				</nav> <!-- .mobile-nav-toggle -->
+
+				<!-- Off Canvas Menu -->
+				<aside class="left-off-canvas-menu">
+					<!-- whatever you want goes here -->
+					<ul class="off-canvas-list">
+						<li><a href="#">Campaigns</a></li>
+						<li><a href="#">Blog</a></li>
+						<li><a href="#">Press</a></li>
+						<li><a href="#">About</a></li>
+						<li><a href="#">Shirts</a></li>
+						<li><a href="#">Farmers Vs Monsanto</a></li>
+						<li><a href="#">Donate</a></li>
+					</ul>
+				</aside>
+			{% endif %}
 
 			<div class="container">
+				{% if page.custom_fields.splash_layout %}
+					<div class="splash-header-wrapper">
+				{% endif %}
+
 				<div class="header-wrapper row">
 					<div id="header" class="large-12 columns">
 						<h1 class="hidden">Food Democracy Now!</h1>
-						<img src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/header.png" alt="Logo" title="Food Democracy Now!" class="hide-for-small">
-						<img src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/mobile-head.png" alt="Logo" title="Food Democracy Now!" class="show-for-small">  
+
+						{% if page.custom_fields.splash_layout %}
+							<a href="http://www.fooddemocracynow.org"><img src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/splash_header.png" alt="Logo" title="Food Democracy Now!"></a>
+						{% else %}
+							<img src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/header.png" alt="Logo" title="Food Democracy Now!" class="hide-for-small">
+							<img src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/img/mobile-head.png" alt="Logo" title="Food Democracy Now!" class="show-for-small">
+						{% endif %}  
 					</div> <!-- #header -->
 
-					<div id="navigation" class="large-12 columns" aria-hidden="true">
-						<nav class="top-bar" role="navigation">
-							<ul class="title-area">
-								<li class="name show-for-small">{% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}</li>
-								<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
-							</ul> <!-- .title-area -->
+					{% if not page.custom_fields.splash_layout %}
+						<div id="navigation" class="large-12 columns" aria-hidden="true">
+							<nav class="top-bar" role="navigation">
+								<ul class="title-area">
+									<li class="name show-for-small">{% filter ak_text:"org_name" %}{% client_name %}{% endfilter %}</li>
+									<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+								</ul> <!-- .title-area -->
 
-							<section class="top-bar-section">
-								<ul class="left">
-									<li><a href="#">Campaigns</a></li>
-									<li><a href="#">Blog</a></li>
-									<li><a href="#">Press</a></li>
-									<li><a href="#">About</a></li>
-									<li><a href="#">Shirts</a></li>
-									<li><a href="#">Farmers Vs Monsanto</a></li>
-									<li><a href="#">Donate</a></li>
-								</ul> <!-- .left -->
+								<section class="top-bar-section">
+									<ul class="left">
+										<li><a href="#">Campaigns</a></li>
+										<li><a href="#">Blog</a></li>
+										<li><a href="#">Press</a></li>
+										<li><a href="#">About</a></li>
+										<li><a href="#">Shirts</a></li>
+										<li><a href="#">Farmers Vs Monsanto</a></li>
+										<li><a href="#">Donate</a></li>
+									</ul> <!-- .left -->
 
-								<div class="socmed">
-									<a href="#" class="fb"><i class="fa fa-facebook"></i></a>
-									<a href="#" class="tw"><i class="fa fa-twitter"></i></a>
-								</div> <!-- .socmed -->
-							</section> <!-- .top-bar-section -->
-						</nav> <!-- .top-bar -->
-					</div> <!-- #navigation -->
+									<div class="socmed">
+										<a href="#" class="fb"><i class="fa fa-facebook"></i></a>
+										<a href="#" class="tw"><i class="fa fa-twitter"></i></a>
+									</div> <!-- .socmed -->
+								</section> <!-- .top-bar-section -->
+							</nav> <!-- .top-bar -->
+						</div> <!-- #navigation -->
+					{% endif %}
 				</div> <!-- .header-wrapper -->
+
+				{% if page.custom_fields.splash_layout %}
+					<div class="grass-border"></div> <!-- .grass-border -->
+				{% endif %}
+
+				{% if page.custom_fields.splash_layout %}
+					</div> <!-- .splash-header-wrapper -->
+
+					<div class="splash-wrapper">
+				{% endif %}
 
 				<div class="body-wrapper row">
 					<div id="body" class="large-12 columns">
 						{% block content %}{% endblock %}
 					</div> <!-- #body -->
 				</div> <!-- .body-wrapper -->
+
+				{% if page.custom_fields.splash_layout %}
+					</div> <!-- .splash-wrapper -->
+				{% endif %}
 
 				{% block below_form %}
 					<script type="text/javascript">
@@ -127,11 +191,11 @@
 
 				<div class="footer-wrapper row">
 					<div class="large-6 columns footer-left">
-						<a href="//example.com/privacy/">{{ 'Privacy'|ak_text:'privacy' }}</a> | <a href="//example.com/contact/">{{ 'Contact'|ak_text:'contact' }}</a>
+						<a href="http://www.fooddemocracynow.org/privacy/">{{ 'Privacy'|ak_text:'privacy' }}</a> | <a href="http://www.fooddemocracynow.org/contact/">{{ 'Contact'|ak_text:'contact' }}</a>
 					</div> <!-- .footer-left -->
 
 					<div class="large-6 columns footer-right">
-						(c) 2014 <a href="http://www.fooddemocracynow.org/">Food Democracy Now!</a> All rights reserved <span class="hide-for-small">|</span> <span class="small-credit">Created By <a href="http://www.richiroutreach.com/">Richir Outreach</a></span>
+						(c) 2014 <a href="http://www.fooddemocracynow.org/">Food Democracy Now!</a> All rights reserved <span>|</span> <span class="small-credit">Created By <a href="http://www.richiroutreach.com/">Richir Outreach</a></span>
 					</div> <!-- .footer-right -->
 				</div> <!-- .footer-wrapper --> 
 			</div> <!-- .container -->
@@ -140,6 +204,17 @@
 		</div>
 	</div>
 
+	{% if page.custom_fields.splash_layout %}
+		<style>
+			.splash-wrapper {
+				background: url({{ page.custom_fields.splash_layout }}) no-repeat; 
+				-webkit-background-size: cover;
+				-moz-background-size: cover;
+				-o-background-size: cover;
+				background-size: cover;
+			}
+		</style>
+	{% endif %}
 
 	{% if analytics_key %}
 		<script>

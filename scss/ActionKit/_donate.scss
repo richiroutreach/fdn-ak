@@ -259,6 +259,23 @@ form .row.background {
 	}
 }
 
+.js {
+	.no-js-warning {
+		display: none;
+	}
+}
+
+.no-js {
+	.no-js-warning {
+		display: block;
+		font-size: 1.15rem;
+	}
+
+	.donation-page {
+		display: none;
+	}
+}
+
 @media #{$medium-only} {
 	.alternate-methods {
 		.button.paypal {

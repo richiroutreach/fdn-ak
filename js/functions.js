@@ -131,7 +131,8 @@ $(document).ready(function() {
 			} else if( field == "amount_other" && value != "" ) {
 				$('#amount_other_field').val(value);
 				$('#amount_other_field').parent('label').addClass('checked');
-
+			} else if ( field.indexOf("product") >= 0 ) {
+				$('#' + field).click();
 			// Must be another field!
 			} else {
 				// Is this an input or a select?
