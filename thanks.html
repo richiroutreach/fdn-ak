@@ -43,8 +43,8 @@
 							</div>
 
 							<div class="medium-12 columns site-email">
-								<div id="email-taf-wrapper">
-									<div id="email-taf" class="taf-email-form hidden">
+								<div id="email-taf-wrapper" class="hidden">
+									<div id="email-taf" class="taf-email-form">
 										<div>
 											<label for="id_taf_emails">
 												{% filter ak_text:"taf_ask" %}{% endfilter %} Enter friend's e-mail addresses (separated by commas):
@@ -123,20 +123,12 @@
 				if (actionkit.args.taf) $("#taf").show();
 
 				$('#taf-click').click(function() {
-					if($('#email-taf').is(':visible')) {
-						$('#email-taf').fadeOut(250, function() {
-							$('#email-taf-wrapper').animate({
-								height: 0
-							}, 250);
-						});
+					if( $('#email-taf-wrapper').hasClass('expanded') ) {
+						$('#email-taf-wrapper').slideUp();
+						$('#email-taf-wrapper').removeClass('expanded');
 					} else {
-						var newHeight = $('#email-taf').outerHeight() + 32;
-
-						$('#email-taf-wrapper').animate({
-							height: newHeight
-						}, 250, function() {
-							$('#email-taf').fadeIn(250);
-						});
+						$('#email-taf-wrapper').slideDown();
+						$('#email-taf-wrapper').addClass('expanded');
 					}
 				});
 
@@ -147,6 +139,9 @@
 				});
 			</script>
 		{% else %}
+			<!-- @START No TAF -->
+			{{ args.taf }}
+
 			{% filter ak_text:"notaf_thanks_banner" %}
 				<div class="thank-you-text">
 					{% comment %}
@@ -200,6 +195,7 @@
 					</div> <!-- .progress-meter -->
 				</div> <!-- .row -->
 			{% endfilter %}
+			<!-- @END No TAF -->
 		{% endif %}
 
 		<script>
@@ -207,6 +203,25 @@
 				var settings = "height=" + height + ",width=" + width + ",status=yes,toolbar=no,menubar=no,location=no";
 				window.open("about:blank","newwindow", settings);
 			}
+
+			function fullBackground() {
+				var headerHeight = $('.splash-header-wrapper').outerHeight(true);
+				var footerHeight = $('.footer-wrapper').outerHeight(true);
+				var windowHeight = $(window).outerHeight(true);
+				var newHeight = windowHeight - footerHeight - headerHeight;
+
+				if( $('.splash-wrapper').height() < newHeight ) {
+					$('.splash-wrapper').css("min-height", newHeight);
+				}
+			}
+
+			$( document ).ready( function() {
+				fullBackground();		
+
+				$( window ).resize( function() {
+					fullBackground();		
+				});
+			});
 		</script>
 	{% endautoescape %}
 {% endblock %}

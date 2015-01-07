@@ -177,6 +177,27 @@
 	*/
 {% endcomment %}
 <script>
+	/*
+		Function to make GA events for problems during donating
+	*/
+	function logValidationErrors() {
+		$('#ak-errors li').each(function() {
+			var knownUser = {% if user.email %}true{% else %}false{% endif %};
+
+			var errorMessage = $(this).html();
+
+			if(errorMessage.length > 0 && errorMessage != "For your security, your card number has been cleared.") {
+				if(knownUser) {
+					ga( 'send', 'event', 'Validation Error', '{{ user.email }}', errorMessage, {{ page.id }} );
+				} else if ( $('#email').val() != "" ) {
+					ga( 'send', 'event', 'Validation Error', $('#email').val(), errorMessage, {{ page.id }} );
+				} else {
+					ga( 'send', 'event', 'Validation Error', 'Unknown User', errorMessage, {{ page.id }} );
+				}
+			}
+		});
+	}
+
 	$(document).ready(function() {
 		// Set up tracking events on form submit
 		$('#act').submit(function() {
@@ -201,6 +222,11 @@
 				{% endif %}				
 			}
 		});
+
+		// Log any errors that AK spits back
+		window.setTimeout(function() {
+			logValidationErrors();
+		}, 500);
 	});
 </script>
 {% comment %}
@@ -234,7 +260,6 @@
 			$('.form-column').innerHeight("auto");
 		}
 	}
-
 
 	$(document).ready(function() {
 		{% if has_shippable_products %}
@@ -382,6 +407,7 @@
 			$('.page-' + page_to_show).show();
 		}
 
+
 		/*
 			---------------------------------------------------------------
 				Fancy Radio Button Code
@@ -437,6 +463,8 @@
 					ga('send', 'event', 'Form Interaction', 'User', 'Next Pressed ({{ user.email }} on ' + (page - 1) + ')');
 				{% endif %}
 			} else {
+				logValidationErrors();
+
 				ga('send', 'event', 'Form Interaction', 'Validation Failure', (page - 1));
 
 				{% if user.email %}
@@ -487,6 +515,8 @@
 		*/
 
 		$('#act').submit(function() {
+			logValidationErrors();
+
 			if( $(this).valid() ) {
 				$('.submit').prop('disabled', true).val("Processing...");
 			}

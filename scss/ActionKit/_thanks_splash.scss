@@ -10,7 +10,19 @@
 		border-radius: 5px;
 	}
 
-	.sharebox {
-		background: rgba(255, 255, 255, 0.65);	
+	.sharebox, .taf-email-form {
+		background: rgba(255, 255, 255, 0.65);
+		box-shadow: none;
+		border-radius: 5px;
+
+		& > label {
+			color: black;
+		}
+	}
+}
+
+@media #{$small-only} {
+	.taf-email-form {
+		margin: 0;
 	}
 }
