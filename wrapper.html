@@ -85,6 +85,9 @@
 	<script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
 	<script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/additional-methods.min.js"></script>
 
+	<!-- jQuery Cookie Plugin -->
+	<script src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/js/jquery.cookie.js"></script>
+
 	<!-- Custom JS -->
 	<script src="https://s3.amazonaws.com/media.fooddemocracynow.org/foundation/js/functions.js"></script>
 </head>
@@ -234,6 +237,19 @@
 	<script>
 		// Initalize Foundation
 		$(document).foundation();
+	</script>
+
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@START - GA Event Tracking
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
+
+	<script>
+		// Global Variable to tell if AK knows who the visitor is or not
+		var knownUser = {% if user.email %}true{% else %}false{% endif %};
 
 		$(document).ready(function() {
 			// Send GA Event Tracking Info
@@ -246,18 +262,62 @@
 				ga('send', 'event', 'View', 'Step', 'Completed ({{ page.type }})');
 				ga('send', 'event', 'View', 'Step', 'Completed ({{ page.id }})');
 
-				{% if user.email %}
+				if(knownUser) {
 					ga('send', 'event', 'View', 'User', 'Completed ({{ user.email }} on {{ page.id }})');
-				{% endif %}
+				} else {
+					ga('send', 'event', 'View', 'User', 'Completed (Unknown User on {{ page.id }})');
+				}
 			{% else %}
 				ga('send', 'event', 'View', 'Step', 'Ask ({{ page.type }})');
 				ga('send', 'event', 'View', 'Step', 'Ask ({{ page.id }})');
 
-				{% if user.email %}
+				if(knownUser) {
 					ga('send', 'event', 'View', 'User', 'Ask ({{ user.email }} on {{ page.id }})');
-				{% endif %}
+				} else {
+					ga('send', 'event', 'View', 'User', 'Ask (Unknown User on {{ page.id }})');				
+				}
 			{% endif %}
+
+			// See if this user has visited the site before
+			if(typeof $.cookie('user') !== 'undefined') {
+				{% if filename|split:'.'|nth:0 == "thanks" %}
+					ga('send', 'event', 'View', 'Cookie', 'Completed (' + $.cookie('user') + ' on {{ page.id }})');
+				{% else %}
+					ga('send', 'event', 'View', 'Cookie', 'Ask (' + $.cookie('user') + ' on {{ page.id }})');
+				{% endif %}
+			}
+
+			// See if the current user has visited this page before
+			{% if filename|split:'.'|nth:0 == "thanks" %}
+				if(typeof $.cookie('thanks-{{ page.id }}') === 'undefined') {
+					ga('send', 'event', 'View', 'Cookie', 'Unique Completed ({{ page.id }})');
+					$.cookie('thanks-{{ page.id }}', 'yes', { expires: 365, path: '/' });
+				}
+			{% else %}
+				if(typeof $.cookie('ask-{{ page.id }}') === 'undefined') {
+					ga('send', 'event', 'View', 'Cookie', 'Unique Ask ({{ page.id }})');
+					$.cookie('ask-{{ page.id }}', 'yes', { expires: 365, path: '/' });
+				}
+			{% endif %}
+
+			// Add the email cookie on form submit
+			$('#act').submit(function() {
+				if(typeof $.cookie('user') === 'undefined') {
+					if(knownUser) {
+						$.cookie('user', '{{ user.email }}', { expires: 365,  path: '/' });
+					} else if ( $('#email').val() != "" ) {
+						$.cookie('user', $('#email').val(), { expires: 365, path: '/'});
+					}
+				}
+			});
 		});
-	</script> 
+	</script>
+{% comment %}
+	/*
+-------------------------------------------------------------------------------
+	@END - GA Event Tracking
+-------------------------------------------------------------------------------
+	*/
+{% endcomment %}
 </body>
 </html>

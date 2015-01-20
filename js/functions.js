@@ -133,6 +133,9 @@ $(document).ready(function() {
 				$('#amount_other_field').parent('label').addClass('checked');
 			} else if ( field.indexOf("product") >= 0 ) {
 				$('#' + field).click();
+			// Select proper donation type
+			} else if (field == "donation_type") {
+				$('input[value="' + value + '"]').click();			
 			// Must be another field!
 			} else {
 				// Is this an input or a select?
