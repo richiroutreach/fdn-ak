@@ -281,9 +281,11 @@
 			// See if this user has visited the site before
 			if(typeof $.cookie('user') !== 'undefined') {
 				{% if filename|split:'.'|nth:0 == "thanks" %}
-					ga('send', 'event', 'View', 'Cookie', 'Completed (' + $.cookie('user') + ' on {{ page.id }})');
+					ga('send', 'event', 'Cookie', 'View', 'Completed (' + $.cookie('user') + ' on {{ page.id }})');
+					ga('send', 'event', 'Cookie', $.cookie('user'), 'Completed ({{ page.id }})');
 				{% else %}
-					ga('send', 'event', 'View', 'Cookie', 'Ask (' + $.cookie('user') + ' on {{ page.id }})');
+					ga('send', 'event', 'Cookie', 'View', 'Ask (' + $.cookie('user') + ' on {{ page.id }})');
+					ga('send', 'event', 'Cookie', $.cookie('user'), 'Ask ({{ page.id }})');
 				{% endif %}
 			}
 

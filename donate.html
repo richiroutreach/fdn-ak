@@ -109,8 +109,6 @@
 		if (new_total != $('#total').html()) {
 			var type = $('input[name=donation_type]:checked').val();
 
-			console.log($('input[name=donation_type]:checked').val());
-
 			if(type == "recurring") {
 				type = "Recurring Monthly";
 			} else {
@@ -203,6 +201,11 @@
 				} else {
 					ga( 'send', 'event', 'Validation Error', 'Unknown User', errorMessage, {{ page.id }} );
 				}
+				
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga( 'send', 'event', 'Cookie', 'Validation Error', $.cookie('user') + ': ' + errorMessage + " on {{ page.id }}", {{ page.id }} );			
+					ga( 'send', 'event', 'Cookie', $.cookie('user'), 'Validation Error: ' + errorMessage + " on {{ page.id }}", {{ page.id }} );			
+				}				
 			}
 		});
 	}
@@ -221,6 +224,11 @@
 					ga('send', 'event', 'Submission Attempt', 'Unknown User', 'Amount (' + $('#ga-amount').val() + ')', {{ page.id }});
 					ga('send', 'event', 'Submission Attempt', 'Unknown User', 'Type (' + $('input[name="donation_type"]:checked').val() + ')', {{ page.id }});
 				}
+
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga('send', 'event', 'Cookie', 'Submission Attempt', $.cookie('user') + ' on {{ page.id }} for ' + $('#ga-amount').val() + ' (' + $('input[name="donation_type"]:checked').val() + ')');
+					ga('send', 'event', 'Cookie', $.cookie('user'), 'Submission Attempt on {{ page.id }} for ' + $('#ga-amount').val() + ' (' + $('input[name="donation_type"]:checked').val() + ')');
+				}
 			}
 		});
 
@@ -234,6 +242,11 @@
 				} else {
 					ga('send', 'event', 'Form Interaction', 'Unkown User', 'Type Changed ('+ $(this).val() + ')', {{ page.id }} );
 				}			
+
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga( 'send', 'event', 'Cookie', 'Form Interaction', 'Type Changed (' + $.cookie('user') + ' to ' + $(this).val() + ')', {{ page.id }});
+					ga( 'send', 'event', 'Cookie', $.cookie('user'),  'Type Changed to ' + $(this).val() + ' on {{ page.id }}', {{ page.id }});
+				}
 			}
 		});
 
@@ -249,8 +262,18 @@
 				} else {
 					ga('send', 'event', 'Form Interaction', 'Unknown User', 'Next Pressed (' + (page - 1) + ')');
 				}
+
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga( 'send', 'event', 'Cookie', 'Form Interaction', 'Next Pressed (' + $.cookie('user') + ' on {{ page.id }})', {{ page.id }});
+					ga( 'send', 'event', 'Cookie', $.cookie('user'),  'Form Interfaction - Next Pressed {{ page.id }}', {{ page.id }});			
+				}
 			} else {
 				logValidationErrors();
+
+				if ( typeof $.cookie('user') !== 'undefined') { 
+					ga( 'send', 'event', 'Cookie', 'Form Interaction', 'Next Pressed w/ Errors (' + $.cookie('user') + ' on {{ page.id }})', {{ page.id }});
+					ga( 'send', 'event', 'Cookie', $.cookie('user'),  'Form Interfaction - Next Pressed w/ Errors {{ page.id }}', {{ page.id }});			
+				}
 			}
 		});
 
@@ -299,7 +322,7 @@
 		});
 
 		if(window.innerWidth > 640) {
-			$('.form-column').innerHeight(minHeight + 160);
+			$('.form-column').innerHeight(minHeight + 160 + $('#ak-errors').height());
 		} else {
 			$('.form-column').innerHeight("auto");
 		}
@@ -447,12 +470,14 @@
 		} 
 
 		if(page_to_show > 1) {
-			$('.page-1').hide();
-			$('.page-' + page_to_show).show();
-
 			// Let AK Update the form with the previous amount
 			window.setTimeout(function() {
 				update_total();
+				fixHeight();
+
+				$('.page-1').fadeOut(300, function() {
+					$('.page-' + page_to_show).delay(50).fadeIn(300);
+				});
 			}, 250);
 		}
 
